@@ -1,2 +1,53 @@
-import Link from "next/link";import {BookOpen,Check,Users} from "lucide-react";import PortalHeader from "../portal-header";
-export default function Signup(){return <div className="authPage"><PortalHeader/><div className="authShell"><section className="authIntro"><h1>Start learning with NOVA.</h1><p>Create a learner account to enroll in available programs, access educational resources and track your learning journey.</p><div className="authPoints"><span><Check size={20}/> Structured learning pathways</span><span><BookOpen size={20}/> Educational resources</span><span><Users size={20}/> Program and coaching support</span></div></section><section className="authPanel"><div className="authCard"><div className="demoNotice">This is the enrollment UI scaffold. No health or clinical information is collected in this initial build.</div><h2>Create Account</h2><p>Join NOVA Learning.</p><form className="formGrid"><div className="formGrid two"><div className="field"><label>First name</label><input placeholder="First name"/></div><div className="field"><label>Last name</label><input placeholder="Last name"/></div></div><div className="field"><label>Email address</label><input type="email" placeholder="you@example.com"/></div><div className="field"><label>I am interested in</label><select defaultValue=""><option value="" disabled>Select a learning pathway</option><option>National Diabetes Prevention Program</option><option>Diabetes Education & Support</option><option>Lifestyle Change Coaching</option><option>Other NOVA education</option></select></div><div className="field"><label>Password</label><input type="password" placeholder="Create a password"/></div><Link href="/dashboard" className="button authSubmit">Create Learner Account</Link></form><p className="authFine">Already registered? <Link href="/login">Log in</Link></p></div></section></div></div>}
+import { BookOpen, Check, Users } from "lucide-react";
+import PortalHeader from "../portal-header";
+import SignupForm from "./signup-form";
+
+export default function Signup() {
+  return (
+    <div className="authPage">
+      <PortalHeader />
+
+      <div className="authShell">
+        <section className="authIntro">
+          <h1>Start learning with NOVA.</h1>
+
+          <p>
+            Create a learner account to enroll in available programs,
+            access educational resources and track your learning journey.
+          </p>
+
+          <div className="authPoints">
+            <span>
+              <Check size={20} />
+              Structured learning pathways
+            </span>
+
+            <span>
+              <BookOpen size={20} />
+              Educational resources
+            </span>
+
+            <span>
+              <Users size={20} />
+              Program and coaching support
+            </span>
+          </div>
+        </section>
+
+        <section className="authPanel">
+          <div className="authCard">
+            <div className="demoNotice">
+              NOVA Learning accounts are for educational access.
+              Do not submit medical or clinical information here.
+            </div>
+
+            <h2>Create Account</h2>
+            <p>Join NOVA Learning.</p>
+
+            <SignupForm />
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}

@@ -1,1 +1,406 @@
-.authPage,.learnPage,.dashboardPage{min-height:100vh;background:#f4fafb;color:#082c52}.portalHeader{height:78px;background:#fff;border-bottom:1px solid #dce9ed;display:flex;align-items:center}.portalHeader .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px}.portalLogo{display:flex;align-items:center;text-decoration:none}.portalLogo img{width:220px;height:62px;object-fit:contain}.portalNav{display:flex;align-items:center;gap:22px}.portalNav a{text-decoration:none;font-size:14px;font-weight:700}.portalNav .portalPrimary{background:#006f8e;color:#fff;padding:11px 18px;border-radius:9px}.authShell{min-height:calc(100vh - 78px);display:grid;grid-template-columns:1fr 1fr}.authIntro{background:linear-gradient(145deg,#05365e,#006e88 65%,#4b9134);color:#fff;padding:9vw 8vw;display:flex;flex-direction:column;justify-content:center}.authIntro h1{font-size:48px;line-height:1.04;margin:0 0 18px}.authIntro p{font-size:17px;line-height:1.6;max-width:570px}.authPoints{display:grid;gap:13px;margin-top:25px}.authPoints span{display:flex;gap:10px;align-items:center}.authPanel{display:flex;align-items:center;justify-content:center;padding:50px 7vw}.authCard{background:#fff;width:min(470px,100%);border:1px solid #dce9ed;border-radius:18px;padding:36px;box-shadow:0 20px 60px #06385f12}.authCard h2{font-size:30px;margin:0 0 7px}.authCard>p{color:#607486;margin:0 0 26px}.formGrid{display:grid;gap:16px}.formGrid.two{grid-template-columns:1fr 1fr}.field{display:grid;gap:7px}.field label{font-size:13px;font-weight:700}.field input,.field select{height:47px;border:1px solid #cbdce2;border-radius:9px;padding:0 13px;font:inherit;color:#082c52;background:#fff}.field input:focus,.field select:focus{outline:2px solid #0c839e44;border-color:#087d9b}.authSubmit{border:0;cursor:pointer;width:100%;margin-top:5px}.authFine{text-align:center;font-size:13px;margin-top:18px!important}.authFine a{color:#00758f;font-weight:700}.catalogHero{background:linear-gradient(110deg,#05385f,#00738d);color:#fff;padding:70px 0}.catalogHero .wrap{display:grid;grid-template-columns:1.4fr .6fr;align-items:center;gap:50px}.catalogHero h1{font-size:48px;margin:0 0 12px}.catalogHero p{font-size:17px;line-height:1.55;max-width:680px}.statCard{background:#ffffff14;border:1px solid #ffffff35;border-radius:16px;padding:25px}.statCard strong{font-size:36px;display:block}.catalog{padding:55px 0}.catalogTop{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:25px}.catalogTop h2{font-size:30px;margin:0}.courseGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}.courseCard{background:#fff;border:1px solid #dce9ed;border-radius:15px;overflow:hidden;box-shadow:0 12px 30px #06385f0b}.courseVisual{height:150px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#087d9b,#07517a)}.courseCard:nth-child(2) .courseVisual{background:linear-gradient(135deg,#6c1e86,#933a9b)}.courseCard:nth-child(3) .courseVisual{background:linear-gradient(135deg,#4b9638,#2e7a45)}.courseVisual svg{width:55px;height:55px}.courseBody{padding:22px}.courseMeta{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#4b9134;font-weight:800}.courseBody h3{font-size:20px;margin:7px 0 8px}.courseBody p{font-size:13px;line-height:1.5;color:#536b7d;min-height:58px}.courseFoot{display:flex;justify-content:space-between;align-items:center;margin-top:18px}.courseFoot a{font-size:13px;font-weight:800;color:#00758f;text-decoration:none}.dashboardShell{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 78px)}.dashSide{background:#06385f;color:#fff;padding:28px 20px}.dashSide h3{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:#9fc6d4}.dashSide nav{display:grid;gap:7px}.dashSide a{color:#fff;text-decoration:none;padding:11px 12px;border-radius:8px;font-size:14px}.dashSide a:first-child{background:#ffffff16}.dashMain{padding:42px}.dashWelcome h1{font-size:34px;margin:0 0 6px}.dashWelcome p{color:#63788a}.dashCards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:30px 0}.dashMetric{background:#fff;border:1px solid #dce9ed;border-radius:14px;padding:20px}.dashMetric strong{display:block;font-size:29px}.dashMetric span{font-size:12px;color:#657b8d}.continueCard{background:#fff;border:1px solid #dce9ed;border-radius:15px;padding:25px}.continueCard h2{margin-top:0}.progress{height:9px;background:#e3edef;border-radius:99px;overflow:hidden;margin:15px 0}.progress span{display:block;width:42%;height:100%;background:#4b9134}.demoNotice{font-size:12px;background:#fff8db;border:1px solid #eedb83;padding:10px 13px;border-radius:8px;margin-bottom:20px;color:#66551a}@media(max-width:900px){.authShell{grid-template-columns:1fr}.authIntro{padding:60px 7vw}.authIntro h1{font-size:38px}.catalogHero .wrap{grid-template-columns:1fr}.courseGrid{grid-template-columns:1fr 1fr}.dashboardShell{grid-template-columns:1fr}.dashSide{display:none}.dashCards{grid-template-columns:1fr 1fr}}@media(max-width:600px){.portalLogo img{width:175px}.portalNav a:not(.portalPrimary){display:none}.authPanel{padding:30px 5vw}.authCard{padding:25px}.formGrid.two{grid-template-columns:1fr}.catalogHero h1{font-size:37px}.courseGrid,.dashCards{grid-template-columns:1fr}.dashMain{padding:28px 5vw}}
+.authPage,.learnPage,.dashboardPage{min-height:100vh;background:#f4fafb;color:#082c52}.portalHeader{height:78px;background:#fff;border-bottom:1px solid #dce9ed;display:flex;align-items:center}.portalHeader .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px}.portalLogo{display:flex;align-items:center;text-decoration:none}.portalLogo img{width:220px;height:62px;object-fit:contain}.portalNav{display:flex;align-items:center;gap:22px}.portalNav a{text-decoration:none;font-size:14px;font-weight:700}.portalNav .portalPrimary{background:#006f8e;color:#fff;padding:11px 18px;border-radius:9px}.authShell{min-height:calc(100vh - 78px);display:grid;grid-template-columns:1fr 1fr}.authIntro{background:linear-gradient(145deg,#05365e,#006e88 65%,#4b9134);color:#fff;padding:9vw 8vw;display:flex;flex-direction:column;justify-content:center}.authIntro h1{font-size:48px;line-height:1.04;margin:0 0 18px}.authIntro p{font-size:17px;line-height:1.6;max-width:570px}.authPoints{display:grid;gap:13px;margin-top:25px}.authPoints span{display:flex;gap:10px;align-items:center}.authPanel{display:flex;align-items:center;justify-content:center;padding:50px 7vw}.authCard{background:#fff;width:min(470px,100%);border:1px solid #dce9ed;border-radius:18px;padding:36px;box-shadow:0 20px 60px #06385f12}.authCard h2{font-size:30px;margin:0 0 7px}.authCard>p{color:#607486;margin:0 0 26px}.formGrid{display:grid;gap:16px}.formGrid.two{grid-template-columns:1fr 1fr}.field{display:grid;gap:7px}.field label{font-size:13px;font-weight:700}.field input,.field select{height:47px;border:1px solid #cbdce2;border-radius:9px;padding:0 13px;font:inherit;color:#082c52;background:#fff}.field input:focus,.field select:focus{outline:2px solid #0c839e44;border-color:#087d9b}.authSubmit{border:0;cursor:pointer;width:100%;margin-top:5px}.authFine{text-align:center;font-size:13px;margin-top:18px!important}.authFine a{color:#00758f;font-weight:700}.catalogHero{background:linear-gradient(110deg,#05385f,#00738d);color:#fff;padding:70px 0}.catalogHero .wrap{display:grid;grid-template-columns:1.4fr .6fr;align-items:center;gap:50px}.catalogHero h1{font-size:48px;margin:0 0 12px}.catalogHero p{font-size:17px;line-height:1.55;max-width:680px}.statCard{background:#ffffff14;border:1px solid #ffffff35;border-radius:16px;padding:25px}.statCard strong{font-size:36px;display:block}.catalog{padding:55px 0}.catalogTop{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:25px}.catalogTop h2{font-size:30px;margin:0}.courseGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}.courseCard{background:#fff;border:1px solid #dce9ed;border-radius:15px;overflow:hidden;box-shadow:0 12px 30px #06385f0b}.courseVisual{height:150px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#087d9b,#07517a)}.courseCard:nth-child(2) .courseVisual{background:linear-gradient(135deg,#6c1e86,#933a9b)}.courseCard:nth-child(3) .courseVisual{background:linear-gradient(135deg,#4b9638,#2e7a45)}.courseVisual svg{width:55px;height:55px}.courseBody{padding:22px}.courseMeta{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#4b9134;font-weight:800}.courseBody h3{font-size:20px;margin:7px 0 8px}.courseBody p{font-size:13px;line-height:1.5;color:#536b7d;min-height:58px}.courseFoot{display:flex;justify-content:space-between;align-items:center;margin-top:18px}.courseFoot a{font-size:13px;font-weight:800;color:#00758f;text-decoration:none}.dashboardShell{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:calc(100vh - 78px)}.dashSide{background:#06385f;color:#fff;padding:28px 20px}.dashSide h3{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:#9fc6d4}.dashSide nav{display:grid;gap:7px}.dashSide a{color:#fff;text-decoration:none;padding:11px 12px;border-radius:8px;font-size:14px}.dashSide a:first-child{background:#ffffff16}.dashMain{padding:42px}.dashWelcome h1{font-size:34px;margin:0 0 6px}.dashWelcome p{color:#63788a}.dashCards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:30px 0}.dashMetric{background:#fff;border:1px solid #dce9ed;border-radius:14px;padding:20px}.dashMetric strong{display:block;font-size:29px}.dashMetric span{font-size:12px;color:#657b8d}.continueCard{background:#fff;border:1px solid #dce9ed;border-radius:15px;padding:25px}.continueCard h2{margin-top:0}.progress{height:9px;background:#e3edef;border-radius:99px;overflow:hidden;margin:15px 0}.progress span{display:block;width:42%;height:100%;background:#4b9134}.demoNotice{font-size:12px;background:#fff8db;border:1px solid #eedb83;padding:10px 13px;border-radius:8px;margin-bottom:20px;color:#66551a}@media(max-width:900px){.authShell{grid-template-columns:1fr}.authIntro{padding:60px 7vw}.authIntro h1{font-size:38px}.catalogHero .wrap{grid-template-columns:1fr}.courseGrid{grid-template-columns:1fr 1fr}.dashboardShell{grid-template-columns:1fr}.dashSide{display:none}.dashCards{grid-template-columns:1fr 1fr}}@media(max-width:600px){.portalLogo img{width:175px}.portalNav a:not(.portalPrimary){display:none}.authPanel{padding:30px 5vw}.authCard{padding:25px}.formGrid.two{grid-template-columns:1fr}.catalogHero h1{font-size:37px}.courseGrid,.dashCards{grid-template-columns:1fr}.dashMain{padding:28px 5vw}}
+/* ========================================
+   NOVA ADMIN LAYOUT
+   ======================================== */
+
+.dashboardSidebar {
+  background: #06385f;
+  color: #fff;
+  padding: 32px 22px;
+  min-width: 0;
+}
+
+.dashboardSidebar h3 {
+  margin: 0 0 24px;
+  font-size: 18px;
+  color: #fff;
+}
+
+.dashboardSidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dashboardSidebar nav a,
+.dashboardSidebar nav span {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  color: #fff;
+  text-decoration: none;
+  padding: 11px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.dashboardSidebar nav a:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.dashboardSidebar > div a {
+  color: #fff;
+  text-decoration: none;
+  display: block;
+  padding: 11px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.dashboardSidebar > div a:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.dashboardMain {
+  min-width: 0;
+  padding: 42px;
+  overflow: hidden;
+}
+
+.dashboardHeading {
+  margin-bottom: 30px;
+}
+
+.dashboardHeading h1 {
+  margin: 6px 0 8px;
+  font-size: 36px;
+  line-height: 1.15;
+}
+
+.dashboardHeading p {
+  margin: 0;
+  color: #63788a;
+  line-height: 1.6;
+}
+
+.dashboardStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: 30px 0;
+}
+
+.dashboardStats .statCard {
+  background: #fff;
+  border: 1px solid #dce9ed;
+  border-radius: 14px;
+  padding: 22px;
+  color: #082c52;
+}
+
+.dashboardStats .statCard strong {
+  display: block;
+  margin-top: 10px;
+  font-size: 30px;
+}
+
+.dashboardStats .statCard span {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: #657b8d;
+}
+
+.learningPanel {
+  background: #fff;
+  border: 1px solid #dce9ed;
+  border-radius: 16px;
+  padding: 26px;
+}
+
+/* Admin responsive layout */
+@media (max-width: 900px) {
+  .dashboardShell {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboardSidebar {
+    padding: 20px;
+  }
+
+  .dashboardSidebar nav {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .dashboardSidebar nav a,
+  .dashboardSidebar nav span {
+    width: auto;
+  }
+
+  .dashboardMain {
+    padding: 30px 5vw;
+  }
+
+  .dashboardStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboardStats {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboardHeading h1 {
+    font-size: 30px;
+  }
+
+  .learningPanel {
+    padding: 20px;
+  }
+}
+/* ========================================
+   NOVA CERTIFICATE
+   ======================================== */
+
+.certificateSheet {
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #dce9ed;
+  padding: 18px;
+  box-shadow: 0 18px 50px #06385f14;
+}
+
+.certificateInner {
+  min-height: 650px;
+  border: 3px solid #06385f;
+  padding: 58px 70px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.certificateMark {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #f4fafb;
+  color: #06385f;
+  margin-bottom: 18px;
+}
+
+.certificateInstitute {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #06385f;
+}
+
+.certificateEyebrow {
+  margin: 28px 0 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .18em;
+  color: #4b9134;
+}
+
+.certificateInner > h2 {
+  margin: 0;
+  font-size: 42px;
+  color: #082c52;
+}
+
+.certificatePresented {
+  margin: 34px 0 8px;
+  color: #63788a;
+}
+
+.certificateName {
+  margin: 0;
+  font-size: 44px;
+  line-height: 1.15;
+  color: #06385f;
+}
+
+.certificateStatement {
+  margin: 30px 0 8px;
+  color: #63788a;
+}
+
+.certificateCourse {
+  margin: 0;
+  max-width: 720px;
+  font-size: 27px;
+  color: #082c52;
+}
+
+.certificateDate {
+  margin-top: 18px;
+  font-size: 15px;
+  color: #536b7d;
+}
+
+.certificateBottom {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: end;
+  margin-top: 65px;
+}
+
+.certificateSignature,
+.certificateVerification {
+  display: grid;
+  gap: 7px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.certificateSignature span,
+.certificateVerification span,
+.certificateVerification small {
+  color: #63788a;
+}
+
+.signatureLine {
+  width: 230px;
+  max-width: 100%;
+  margin: 0 auto 8px;
+  border-top: 1px solid #082c52;
+}
+
+@media (max-width: 700px) {
+  .certificateInner {
+    padding: 40px 25px;
+  }
+
+  .certificateInner > h2 {
+    font-size: 32px;
+  }
+
+  .certificateName {
+    font-size: 34px;
+  }
+
+  .certificateCourse {
+    font-size: 22px;
+  }
+
+  .certificateBottom {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+/* ========================================
+   NOVA CERTIFICATE PRINTING
+   ======================================== */
+
+@page {
+  size: landscape;
+  margin: 10mm;
+}
+
+@media print {
+  .portalHeader,
+  .dashboardSidebar,
+  .dashboardHeading,
+  .certificateActions {
+    display: none !important;
+  }
+
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  .authPage {
+    min-height: 0 !important;
+    background: #fff !important;
+  }
+
+  .dashboardShell {
+    display: block !important;
+    min-height: 0 !important;
+  }
+
+  .dashboardMain {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  .certificateSheet {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 8mm !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    box-sizing: border-box;
+  }
+
+  .certificateInner {
+  min-height: 0 !important;
+  height: 165mm !important;
+  padding: 8mm 16mm !important;
+  box-sizing: border-box !important;
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+  overflow: hidden !important;
+}
+  .certificateBottom {
+    margin-top: 14mm !important;
+  }
+}
+.learnerCertificatePage {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.certificateMark {
+  width: 58px !important;
+  height: 58px !important;
+  margin-bottom: 8px !important;
+}
+
+.certificateMark svg {
+  width: 32px !important;
+  height: 32px !important;
+}
+
+.certificateEyebrow {
+  margin: 12px 0 5px !important;
+}
+
+.certificateInner > h2 {
+  font-size: 32px !important;
+}
+
+.certificatePresented {
+  margin: 16px 0 5px !important;
+}
+
+.certificateName {
+  font-size: 36px !important;
+}
+
+.certificateStatement {
+  margin: 14px 0 5px !important;
+}
+
+.certificateCourse {
+  font-size: 23px !important;
+}
+
+.certificateDate {
+  margin-top: 10px !important;
+}
+
+.certificateBottom {
+  margin-top: 10mm !important;
+}
