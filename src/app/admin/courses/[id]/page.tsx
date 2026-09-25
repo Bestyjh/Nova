@@ -1,6 +1,6 @@
 import AdminSidebar from "../../admin-sidebar";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import {
   ArrowLeft,
   BookOpen,
@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import PortalHeader from "../../../portal-header";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 type PageProps = {
   params: Promise<{
@@ -25,32 +25,7 @@ export default async function AdminCoursePage({
 }: PageProps) {
   const { id } = await params;
 
-  const supabase = await createClient();
-
-  // Authenticate administrator.
-  const { data: claimsData, error: claimsError } =
-    await supabase.auth.getClaims();
-
-  const userId = claimsData?.claims?.sub;
-
-  if (claimsError || !userId) {
-    redirect("/login");
-  }
-
-  const { data: profile, error: profileError } =
-    await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", userId)
-      .single();
-
-  if (
-    profileError ||
-    !profile ||
-    profile.role !== "admin"
-  ) {
-    redirect("/dashboard");
-  }
+  const { supabase } = await requireAdmin();
 
   // Load course curriculum.
   const { data: course, error: courseError } =
@@ -338,7 +313,7 @@ export default async function AdminCoursePage({
                                 </strong>
 
                                 <div className="courseMeta">
-                                  {lesson.kind} ·{" "}
+                                  {lesson.kind} Â·{" "}
                                   {lesson.published
                                     ? "Published"
                                     : "Draft"}
@@ -385,3 +360,4 @@ export default async function AdminCoursePage({
     </div>
   );
 }
+

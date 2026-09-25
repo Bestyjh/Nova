@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import {
   BookOpen,
   CheckCircle2,
@@ -7,20 +6,10 @@ import {
 } from "lucide-react";
 
 import PortalHeader from "../portal-header";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/auth/require-user";
 
 export default async function Dashboard() {
-  const supabase = await createClient();
-
-  // Authenticate learner.
-  const { data: claimsData, error: claimsError } =
-    await supabase.auth.getClaims();
-
-  const userId = claimsData?.claims?.sub;
-
-  if (claimsError || !userId) {
-    redirect("/login");
-  }
+  const { supabase, userId } = await requireUser();
 
   // Load learner profile.
   const { data: profile } = await supabase

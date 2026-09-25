@@ -3,38 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { createClient } from "@/lib/supabase/server";
-
-async function requireAdmin() {
-  const supabase = await createClient();
-
-  const { data: claimsData, error: claimsError } =
-    await supabase.auth.getClaims();
-
-  const userId = claimsData?.claims?.sub;
-
-  if (claimsError || !userId) {
-    redirect("/login");
-  }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", userId)
-    .single();
-
-  if (profile?.role !== "admin") {
-    redirect("/dashboard");
-  }
-
-  return supabase;
-}
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export async function createModule(
   courseId: string,
   formData: FormData
 ) {
-  const supabase = await requireAdmin();
+  const { supabase } = await requireAdmin();
 
   const title =
     formData.get("title")?.toString().trim() ?? "";
@@ -83,7 +58,7 @@ export async function updateModule(
   moduleId: string,
   formData: FormData
 ) {
-  const supabase = await requireAdmin();
+  const { supabase } = await requireAdmin();
 
   const title =
     formData.get("title")?.toString().trim() ?? "";
@@ -140,7 +115,7 @@ export async function deleteModule(
   courseId: string,
   moduleId: string
 ) {
-  const supabase = await requireAdmin();
+  const { supabase } = await requireAdmin();
 
   // Verify that this module belongs to this course.
   const { data: moduleRecord, error: moduleError } =
