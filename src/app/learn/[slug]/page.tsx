@@ -8,6 +8,7 @@ import {
 
 import PortalHeader from "../../portal-header";
 import { createClient } from "@/lib/supabase/server";
+import { getPublishedCourseBySlug } from "@/lib/data/courses";
 
 type PageProps = {
   params: Promise<{
@@ -27,28 +28,8 @@ export default async function CoursePage({
 
   const userId = claimsData?.claims?.sub;
 
-  const { data: course, error } = await supabase
-    .from("courses")
-    .select(`
-      id,
-      title,
-      slug,
-      summary,
-      modules (
-        id,
-        title,
-        position,
-        lessons (
-          id,
-          title,
-          position,
-          kind
-        )
-      )
-    `)
-    .eq("slug", slug)
-    .eq("published", true)
-    .single();
+  const { data: course, error } =
+    await getPublishedCourseBySlug(supabase, slug);
 
   if (error || !course) {
     notFound();

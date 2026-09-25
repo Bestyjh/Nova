@@ -13,6 +13,7 @@ import {
 
 import PortalHeader from "../../../portal-header";
 import { requireAdmin } from "@/lib/auth/require-admin";
+import { getAdminCourseCurriculum } from "@/lib/data/courses";
 
 type PageProps = {
   params: Promise<{
@@ -29,29 +30,7 @@ export default async function AdminCoursePage({
 
   // Load course curriculum.
   const { data: course, error: courseError } =
-    await supabase
-      .from("courses")
-      .select(`
-        id,
-        title,
-        slug,
-        summary,
-        published,
-        modules (
-          id,
-          title,
-          position,
-          lessons (
-            id,
-            title,
-            position,
-            kind,
-            published
-          )
-        )
-      `)
-      .eq("id", id)
-      .single();
+    await getAdminCourseCurriculum(supabase, id);
 
   if (courseError || !course) {
     notFound();
@@ -313,7 +292,7 @@ export default async function AdminCoursePage({
                                 </strong>
 
                                 <div className="courseMeta">
-                                  {lesson.kind} Â·{" "}
+                                  {lesson.kind} Ã‚Â·{" "}
                                   {lesson.published
                                     ? "Published"
                                     : "Draft"}

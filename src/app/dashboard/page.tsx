@@ -7,16 +7,14 @@ import {
 
 import PortalHeader from "../portal-header";
 import { requireUser } from "@/lib/auth/require-user";
+import { getProfileSummary } from "@/lib/data/profiles";
 
 export default async function Dashboard() {
   const { supabase, userId } = await requireUser();
 
   // Load learner profile.
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("first_name, last_name, role")
-    .eq("id", userId)
-    .single();
+  const { data: profile } =
+    await getProfileSummary(supabase, userId);
 
   const firstName = profile?.first_name || "Learner";
 

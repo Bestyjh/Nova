@@ -1,16 +1,13 @@
 import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth/require-user";
+import { getProfileRole } from "@/lib/data/profiles";
 
 export async function requireAdmin() {
   const { supabase, userId } = await requireUser();
 
   const { data: profile, error: profileError } =
-    await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", userId)
-      .single();
+    await getProfileRole(supabase, userId);
 
   if (
     profileError ||
