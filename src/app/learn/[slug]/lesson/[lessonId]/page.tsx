@@ -8,8 +8,8 @@ import {
 
 import PortalHeader from "../../../../portal-header";
 import { createClient } from "@/lib/supabase/server";
-import { getCompletedLessonIdsForLessons } from "@/lib/data/progress";
 import CompleteLessonButton from "./complete-lesson-button";
+import LessonContent from "../../../lesson-content";
 
 type PageProps = {
   params: Promise<{
@@ -149,11 +149,14 @@ export default async function LessonPage({
   );
 
   const { data: progressRecords } =
-    await getCompletedLessonIdsForLessons(
-      supabase,
-      userId,
-      lessonIds
-    );
+    lessonIds.length > 0
+      ? await supabase
+          .from("lesson_progress")
+          .select("lesson_id, completed")
+          .eq("user_id", userId)
+          .in("lesson_id", lessonIds)
+          .eq("completed", true)
+      : { data: [] };
 
   const completedLessonIds = new Set(
     progressRecords?.map(
@@ -253,22 +256,9 @@ export default async function LessonPage({
                 </p>
               )}
 
-      <h3>Lesson Content</h3>
+     <h3>Lesson Content</h3>
 
-{lesson.content ? (
-  <div
-    style={{
-      whiteSpace: "pre-wrap",
-      lineHeight: 1.7,
-    }}
-  >
-    {typeof lesson.content === "string"
-      ? lesson.content.replace(/<br\s*\/?>/gi, "\n")
-      : JSON.stringify(lesson.content)}
-  </div>
-) : (
-  <p>No lesson content has been added yet.</p>
-)}
+<LessonContent content={lesson.content} />
 
 <CompleteLessonButton
   lessonId={lesson.id}
