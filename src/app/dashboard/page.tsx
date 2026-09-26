@@ -138,13 +138,16 @@ const certificateByEnrollment = new Map(
               Overview
             </Link>
 
-            <Link href="/learn">
-              My Learning
-            </Link>
+       <Link href="/learn">
+  My Learning
+</Link>
 
-            <span>Resources</span>
-            <span>Sessions</span>
-            <span>Profile</span>
+<Link href="/resources">
+  Resources
+</Link>
+
+<span>Sessions</span>
+<span>Profile</span>
           </nav>
         </aside>
 

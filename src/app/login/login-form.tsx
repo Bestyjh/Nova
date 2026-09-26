@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginForm() {
@@ -11,15 +12,23 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(
+    event: FormEvent<HTMLFormElement>
+  ) {
     event.preventDefault();
+
     setError("");
     setLoading(true);
 
     const form = new FormData(event.currentTarget);
 
-    const email = String(form.get("email") || "").trim();
-    const password = String(form.get("password") || "");
+    const email = String(
+      form.get("email") || ""
+    ).trim();
+
+    const password = String(
+      form.get("password") || ""
+    );
 
     const supabase = createClient();
 
@@ -29,21 +38,57 @@ export default function LoginForm() {
         password,
       });
 
-    setLoading(false);
-
     if (loginError) {
+      setLoading(false);
       setError(loginError.message);
       return;
     }
 
-    router.push("/dashboard");
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      setLoading(false);
+      setError("Unable to verify your account.");
+      return;
+    }
+
+    const {
+      data: profile,
+      error: profileError,
+    } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError || !profile) {
+      setLoading(false);
+      setError(
+        "Unable to load your account profile."
+      );
+      return;
+    }
+
+    if (profile.role === "admin") {
+      router.push("/admin");
+    } else {
+      router.push("/dashboard");
+    }
+
     router.refresh();
   }
 
   return (
-    <form className="formGrid" onSubmit={handleSubmit}>
+    <form
+      className="formGrid"
+      onSubmit={handleSubmit}
+    >
       <div className="field">
-        <label htmlFor="email">Email address</label>
+        <label htmlFor="email">
+          Email address
+        </label>
 
         <input
           id="email"
@@ -56,7 +101,9 @@ export default function LoginForm() {
       </div>
 
       <div className="field">
-        <label htmlFor="password">Password</label>
+        <label htmlFor="password">
+          Password
+        </label>
 
         <input
           id="password"
@@ -69,7 +116,10 @@ export default function LoginForm() {
       </div>
 
       {error && (
-        <p className="authError" role="alert">
+        <p
+          className="authError"
+          role="alert"
+        >
           {error}
         </p>
       )}
@@ -84,7 +134,9 @@ export default function LoginForm() {
 
       <p className="authFine">
         New to NOVA Learning?{" "}
-        <Link href="/signup">Create an account</Link>
+        <Link href="/signup">
+          Create an account
+        </Link>
       </p>
     </form>
   );
