@@ -1,6 +1,6 @@
 import AdminSidebar from "./admin-sidebar";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+
 import {
   BookOpen,
   CircleCheck,
@@ -9,37 +9,21 @@ import {
 } from "lucide-react";
 
 import PortalHeader from "../portal-header";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/auth/require-admin";
+import { getProfileSummary } from "@/lib/data/profiles";
 
 export default async function AdminPage() {
-  const supabase = await createClient();
+  const { supabase, userId } = await requireAdmin();
 
-  // Authenticate.
-  const { data: claimsData, error: claimsError } =
-    await supabase.auth.getClaims();
-
-  const userId = claimsData?.claims?.sub;
-
-  if (claimsError || !userId) {
-    redirect("/login");
-  }
-
-  // Authorize.
   const { data: profile, error: profileError } =
-    await supabase
-      .from("profiles")
-      .select("first_name, last_name, role")
-      .eq("id", userId)
-      .single();
+    await getProfileSummary(supabase, userId);
 
-  if (
-    profileError ||
-    !profile ||
-    profile.role !== "admin"
-  ) {
-    redirect("/dashboard");
+  if (profileError || !profile) {
+    throw new Error(
+      profileError?.message ??
+        "Unable to load administrator profile."
+    );
   }
-
   // Load dashboard statistics.
   const [
     coursesResult,
