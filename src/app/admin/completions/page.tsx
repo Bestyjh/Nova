@@ -1,6 +1,5 @@
 import AdminSidebar from "../admin-sidebar";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import {
   Award,
   CheckCircle2,
@@ -9,31 +8,10 @@ import {
 } from "lucide-react";
 
 import PortalHeader from "@/app/portal-header";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export default async function CompletionsPage() {
-  const supabase = await createClient();
-
-  // Authentication
-  const { data: claimsData, error: claimsError } =
-    await supabase.auth.getClaims();
-
-  const adminId = claimsData?.claims?.sub;
-
-  if (claimsError || !adminId) {
-    redirect("/login");
-  }
-
-  // Admin authorization
-  const { data: adminProfile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", adminId)
-    .single();
-
-  if (adminProfile?.role !== "admin") {
-    redirect("/dashboard");
-  }
+  const { supabase } = await requireAdmin();
 
   // Completed enrollment records
   const {
@@ -301,7 +279,7 @@ export default async function CompletionsPage() {
                           <span className="courseMeta">
                             {record.profile?.role ??
                               "unknown"}{" "}
-                            · completed
+                            Â· completed
                           </span>
 
                           <h3>

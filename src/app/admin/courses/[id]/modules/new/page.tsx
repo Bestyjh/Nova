@@ -1,10 +1,10 @@
 import AdminSidebar from "../../../../admin-sidebar";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import PortalHeader from "../../../../../portal-header";
-import { createClient } from "@/lib/supabase/server";
 import { createModule } from "../../module-actions";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 type PageProps = {
   params: Promise<{
@@ -17,26 +17,7 @@ export default async function NewModulePage({
 }: PageProps) {
   const { id } = await params;
 
-  const supabase = await createClient();
-
-  const { data: claimsData } =
-    await supabase.auth.getClaims();
-
-  const userId = claimsData?.claims?.sub;
-
-  if (!userId) {
-    redirect("/login");
-  }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", userId)
-    .single();
-
-  if (profile?.role !== "admin") {
-    redirect("/dashboard");
-  }
+  const { supabase } = await requireAdmin();
 
   const { data: course } = await supabase
     .from("courses")
@@ -61,7 +42,7 @@ export default async function NewModulePage({
                 href={`/admin/courses/${course.id}`}
                 className="courseMeta"
               >
-                ← Back to Course
+                â† Back to Course
               </Link>
 
               <p

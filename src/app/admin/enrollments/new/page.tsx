@@ -1,34 +1,14 @@
 import AdminSidebar from "../../admin-sidebar";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 import PortalHeader from "@/app/portal-header";
-import { createClient } from "@/lib/supabase/server";
 import { getEnrollmentPairs } from "@/lib/data/enrollments";
 import { createEnrollment } from "../actions";
 import EnrollmentForm from "./enrollment-form";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export default async function NewEnrollmentPage() {
-  const supabase = await createClient();
-
-  const { data: claimsData, error: claimsError } =
-    await supabase.auth.getClaims();
-
-  const adminId = claimsData?.claims?.sub;
-
-  if (claimsError || !adminId) {
-    redirect("/login");
-  }
-
-  const { data: adminProfile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", adminId)
-    .single();
-
-  if (adminProfile?.role !== "admin") {
-    redirect("/dashboard");
-  }
+  const { supabase } = await requireAdmin();
 
   const { data: learners, error: learnersError } =
     await supabase
@@ -82,7 +62,7 @@ if (enrollmentsError) {
                 href="/admin/enrollments"
                 className="courseMeta"
               >
-                â† Back to Enrollments
+                Ã¢â€ Â Back to Enrollments
               </Link>
 
               <p

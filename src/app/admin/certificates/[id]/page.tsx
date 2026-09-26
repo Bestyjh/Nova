@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Award } from "lucide-react";
 
 import PortalHeader from "@/app/portal-header";
-import { createClient } from "@/lib/supabase/server";
 import AdminSidebar from "../../admin-sidebar";
 import PrintCertificateButton from "./print-certificate-button";
 import { getAdminCertificateById } from "@/lib/data/certificates";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 type PageProps = {
   params: Promise<{
@@ -19,28 +19,7 @@ export default async function CertificatePage({
 }: PageProps) {
   const { id } = await params;
 
-  const supabase = await createClient();
-
-  // Authenticate.
-  const { data: claimsData, error: claimsError } =
-    await supabase.auth.getClaims();
-
-  const adminId = claimsData?.claims?.sub;
-
-  if (claimsError || !adminId) {
-    redirect("/login");
-  }
-
-  // Authorize admin.
-  const { data: adminProfile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", adminId)
-    .single();
-
-  if (adminProfile?.role !== "admin") {
-    redirect("/dashboard");
-  }
+  const { supabase } = await requireAdmin();
 
   // Load the permanent certificate record.
   const {
@@ -129,7 +108,7 @@ export default async function CertificatePage({
                 href={`/admin/completions/${certificate.enrollment_id}`}
                 className="courseMeta"
               >
-                â† Completion Record
+                Ã¢â€ Â Completion Record
               </Link>
 
               <p
@@ -162,7 +141,7 @@ export default async function CertificatePage({
     href={`/admin/completions/${certificate.enrollment_id}`}
     className="button compact"
   >
-    â† Back to Completion
+    Ã¢â€ Â Back to Completion
   </Link>
 
   <PrintCertificateButton />

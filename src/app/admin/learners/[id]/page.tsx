@@ -1,6 +1,6 @@
 import AdminSidebar from "../../admin-sidebar";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import {
   BookOpen,
   CheckCircle2,
@@ -8,9 +8,9 @@ import {
 } from "lucide-react";
 
 import PortalHeader from "@/app/portal-header";
-import { createClient } from "@/lib/supabase/server";
 import { getLearnerEnrollmentsWithCurriculum } from "@/lib/data/enrollments";
 import { getCompletedLessonIds } from "@/lib/data/progress";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 type PageProps = {
   params: Promise<{
@@ -23,26 +23,7 @@ export default async function LearnerPage({
 }: PageProps) {
   const { id } = await params;
 
-  const supabase = await createClient();
-
-  const { data: claimsData, error: claimsError } =
-    await supabase.auth.getClaims();
-
-  const adminId = claimsData?.claims?.sub;
-
-  if (claimsError || !adminId) {
-    redirect("/login");
-  }
-
-  const { data: adminProfile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", adminId)
-    .single();
-
-  if (adminProfile?.role !== "admin") {
-    redirect("/dashboard");
-  }
+  const { supabase } = await requireAdmin();
 
   const { data: learner, error: learnerError } =
     await supabase
@@ -158,7 +139,7 @@ export default async function LearnerPage({
                 href="/admin/learners"
                 className="courseMeta"
               >
-                Ã¢â€ Â All Learners
+                ÃƒÂ¢Ã¢â‚¬Â Ã‚Â All Learners
               </Link>
 
               <p

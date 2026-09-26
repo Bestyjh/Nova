@@ -1,6 +1,5 @@
 import AdminSidebar from "../admin-sidebar";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import {
   BookOpen,
   CheckCircle2,
@@ -10,36 +9,10 @@ import {
 } from "lucide-react";
 
 import PortalHeader from "../../portal-header";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export default async function AdminCoursesPage() {
-  const supabase = await createClient();
-
-  // Authenticate.
-  const { data: claimsData, error: claimsError } =
-    await supabase.auth.getClaims();
-
-  const userId = claimsData?.claims?.sub;
-
-  if (claimsError || !userId) {
-    redirect("/login");
-  }
-
-  // Authorize administrator.
-  const { data: profile, error: profileError } =
-    await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", userId)
-      .single();
-
-  if (
-    profileError ||
-    !profile ||
-    profile.role !== "admin"
-  ) {
-    redirect("/dashboard");
-  }
+  const { supabase } = await requireAdmin();
 
   // Load courses with modules, lessons and enrollments.
   const { data: courses, error: coursesError } =

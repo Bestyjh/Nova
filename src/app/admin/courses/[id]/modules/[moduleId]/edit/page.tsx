@@ -1,14 +1,13 @@
 import AdminSidebar from "../../../../../admin-sidebar";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import PortalHeader from "@/app/portal-header";
-import { createClient } from "@/lib/supabase/server";
 import {
   deleteModule,
   updateModule,
 } from "../../../module-actions";
-
+import { requireAdmin } from "@/lib/auth/require-admin";
 type PageProps = {
   params: Promise<{
     id: string;
@@ -21,28 +20,7 @@ export default async function EditModulePage({
 }: PageProps) {
   const { id, moduleId } = await params;
 
-  const supabase = await createClient();
-
-  // Authenticate.
-  const { data: claimsData, error: claimsError } =
-    await supabase.auth.getClaims();
-
-  const userId = claimsData?.claims?.sub;
-
-  if (claimsError || !userId) {
-    redirect("/login");
-  }
-
-  // Authorize admin.
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", userId)
-    .single();
-
-  if (profile?.role !== "admin") {
-    redirect("/dashboard");
-  }
+  const { supabase } = await requireAdmin();
 
   // Load the module and make sure it belongs
   // to the course in the URL.
@@ -91,7 +69,7 @@ export default async function EditModulePage({
                 href={`/admin/courses/${course.id}`}
                 className="courseMeta"
               >
-                ← Back to Course
+                â† Back to Course
               </Link>
 
               <p

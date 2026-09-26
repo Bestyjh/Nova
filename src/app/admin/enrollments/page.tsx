@@ -1,6 +1,5 @@
 import AdminSidebar from "../admin-sidebar";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import {
   BookOpen,
   CheckCircle2,
@@ -8,30 +7,11 @@ import {
 } from "lucide-react";
 
 import PortalHeader from "@/app/portal-header";
-import { createClient } from "@/lib/supabase/server";
 import { getAllEnrollments } from "@/lib/data/enrollments";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export default async function EnrollmentsPage() {
-  const supabase = await createClient();
-
-  const { data: claimsData, error: claimsError } =
-    await supabase.auth.getClaims();
-
-  const userId = claimsData?.claims?.sub;
-
-  if (claimsError || !userId) {
-    redirect("/login");
-  }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", userId)
-    .single();
-
-  if (profile?.role !== "admin") {
-    redirect("/dashboard");
-  }
+  const { supabase } = await requireAdmin();
 
   const { data: enrollments, error: enrollmentsError } =
     await getAllEnrollments(supabase);
@@ -196,7 +176,7 @@ if (coursesError) {
           <div>
             <span className="courseMeta">
               {learner?.role ?? "unknown"}{" "}
-              Â· {record.status}
+              Ã‚Â· {record.status}
             </span>
 
             <h3>{name}</h3>
