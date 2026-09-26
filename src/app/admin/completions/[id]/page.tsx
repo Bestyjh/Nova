@@ -13,6 +13,7 @@ import {
 import PortalHeader from "@/app/portal-header";
 import { createClient } from "@/lib/supabase/server";
 import AdminSidebar from "../../admin-sidebar";
+import { getCertificateByEnrollment } from "@/lib/data/certificates";
 
 type PageProps = {
   params: Promise<{
@@ -129,16 +130,10 @@ export default async function CompletionDetailPage({
 const {
   data: certificate,
   error: certificateError,
-} = await supabase
-  .from("certificates")
-  .select(`
-    id,
-    certificate_number,
-    issued_at,
-    issued_by
-  `)
-  .eq("enrollment_id", enrollment.id)
-  .maybeSingle();
+} = await getCertificateByEnrollment(
+  supabase,
+  enrollment.id
+);
 
 if (certificateError) {
   throw new Error(certificateError.message);
@@ -214,7 +209,7 @@ if (certificateError) {
                 href="/admin/completions"
                 className="courseMeta"
               >
-                ← All Completions
+                â† All Completions
               </Link>
 
               <p

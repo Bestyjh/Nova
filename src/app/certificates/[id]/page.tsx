@@ -5,6 +5,7 @@ import { Award } from "lucide-react";
 import PortalHeader from "@/app/portal-header";
 import { createClient } from "@/lib/supabase/server";
 import PrintCertificateButton from "./print-certificate-button";
+import { getLearnerCertificateById } from "@/lib/data/certificates";
 
 type PageProps = {
   params: Promise<{
@@ -37,19 +38,11 @@ export default async function LearnerCertificatePage({
   const {
     data: certificate,
     error: certificateError,
-  } = await supabase
-    .from("certificates")
-    .select(`
-      id,
-      enrollment_id,
-      user_id,
-      course_id,
-      certificate_number,
-      issued_at
-    `)
-    .eq("id", id)
-    .eq("user_id", userId)
-    .maybeSingle();
+  } = await getLearnerCertificateById(
+    supabase,
+    id,
+    userId
+  );
 
   if (certificateError || !certificate) {
     notFound();
@@ -131,7 +124,7 @@ export default async function LearnerCertificatePage({
               href="/dashboard"
               className="courseMeta"
             >
-              ← Learner Dashboard
+              â† Learner Dashboard
             </Link>
 
             <p
@@ -163,7 +156,7 @@ export default async function LearnerCertificatePage({
             href="/dashboard"
             className="button compact"
           >
-            ← Back to Dashboard
+            â† Back to Dashboard
           </Link>
 
           <PrintCertificateButton />

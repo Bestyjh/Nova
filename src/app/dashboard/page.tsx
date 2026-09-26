@@ -10,6 +10,7 @@ import { requireUser } from "@/lib/auth/require-user";
 import { getProfileSummary } from "@/lib/data/profiles";
 import { getUserEnrollmentsWithCurriculum } from "@/lib/data/enrollments";
 import { getCompletedLessonIds } from "@/lib/data/progress";
+import { getUserCertificates } from "@/lib/data/certificates";
 
 export default async function Dashboard() {
   const { supabase, userId } = await requireUser();
@@ -47,15 +48,7 @@ export default async function Dashboard() {
 const {
   data: certificates,
   error: certificatesError,
-} = await supabase
-  .from("certificates")
-  .select(`
-    id,
-    enrollment_id,
-    certificate_number,
-    issued_at
-  `)
-  .eq("user_id", userId);
+} = await getUserCertificates(supabase, userId);
 
 if (certificatesError) {
   throw new Error(certificatesError.message);

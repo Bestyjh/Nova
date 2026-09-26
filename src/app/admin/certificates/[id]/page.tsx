@@ -6,6 +6,7 @@ import PortalHeader from "@/app/portal-header";
 import { createClient } from "@/lib/supabase/server";
 import AdminSidebar from "../../admin-sidebar";
 import PrintCertificateButton from "./print-certificate-button";
+import { getAdminCertificateById } from "@/lib/data/certificates";
 
 type PageProps = {
   params: Promise<{
@@ -45,19 +46,7 @@ export default async function CertificatePage({
   const {
     data: certificate,
     error: certificateError,
-  } = await supabase
-    .from("certificates")
-    .select(`
-      id,
-      enrollment_id,
-      user_id,
-      course_id,
-      certificate_number,
-      issued_at,
-      issued_by
-    `)
-    .eq("id", id)
-    .maybeSingle();
+  } = await getAdminCertificateById(supabase, id);
 
   if (certificateError || !certificate) {
     notFound();
@@ -140,7 +129,7 @@ export default async function CertificatePage({
                 href={`/admin/completions/${certificate.enrollment_id}`}
                 className="courseMeta"
               >
-                ← Completion Record
+                â† Completion Record
               </Link>
 
               <p
@@ -173,7 +162,7 @@ export default async function CertificatePage({
     href={`/admin/completions/${certificate.enrollment_id}`}
     className="button compact"
   >
-    ← Back to Completion
+    â† Back to Completion
   </Link>
 
   <PrintCertificateButton />
