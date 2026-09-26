@@ -8,6 +8,7 @@ import {
 
 import PortalHeader from "../../../../portal-header";
 import { createClient } from "@/lib/supabase/server";
+import { getCompletedLessonIdsForLessons } from "@/lib/data/progress";
 import CompleteLessonButton from "./complete-lesson-button";
 
 type PageProps = {
@@ -148,14 +149,11 @@ export default async function LessonPage({
   );
 
   const { data: progressRecords } =
-    lessonIds.length > 0
-      ? await supabase
-          .from("lesson_progress")
-          .select("lesson_id, completed")
-          .eq("user_id", userId)
-          .in("lesson_id", lessonIds)
-          .eq("completed", true)
-      : { data: [] };
+    await getCompletedLessonIdsForLessons(
+      supabase,
+      userId,
+      lessonIds
+    );
 
   const completedLessonIds = new Set(
     progressRecords?.map(

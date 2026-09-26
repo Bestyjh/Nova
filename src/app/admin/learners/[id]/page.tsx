@@ -10,6 +10,7 @@ import {
 import PortalHeader from "@/app/portal-header";
 import { createClient } from "@/lib/supabase/server";
 import { getLearnerEnrollmentsWithCurriculum } from "@/lib/data/enrollments";
+import { getCompletedLessonIds } from "@/lib/data/progress";
 
 type PageProps = {
   params: Promise<{
@@ -69,11 +70,11 @@ export default async function LearnerPage({
     throw new Error(enrollmentError.message);
   }
 
-  const { data: lessonProgress } = await supabase
-    .from("lesson_progress")
-    .select("lesson_id, completed")
-    .eq("user_id", learner.id)
-    .eq("completed", true);
+  const { data: lessonProgress } =
+    await getCompletedLessonIds(
+      supabase,
+      learner.id
+    );
 
   const completedLessonIds = new Set(
     lessonProgress?.map(
@@ -157,7 +158,7 @@ export default async function LearnerPage({
                 href="/admin/learners"
                 className="courseMeta"
               >
-                â† All Learners
+                Ã¢â€ Â All Learners
               </Link>
 
               <p

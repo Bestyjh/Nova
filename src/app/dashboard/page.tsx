@@ -9,6 +9,7 @@ import PortalHeader from "../portal-header";
 import { requireUser } from "@/lib/auth/require-user";
 import { getProfileSummary } from "@/lib/data/profiles";
 import { getUserEnrollmentsWithCurriculum } from "@/lib/data/enrollments";
+import { getCompletedLessonIds } from "@/lib/data/progress";
 
 export default async function Dashboard() {
   const { supabase, userId } = await requireUser();
@@ -34,11 +35,8 @@ export default async function Dashboard() {
   ) ?? [];
 
   // Load this learner's completed lessons.
-  const { data: lessonProgress } = await supabase
-    .from("lesson_progress")
-    .select("lesson_id")
-    .eq("user_id", userId)
-    .eq("completed", true);
+  const { data: lessonProgress } =
+    await getCompletedLessonIds(supabase, userId);
 
   const completedLessonIds = new Set(
     lessonProgress?.map((item) => item.lesson_id) ?? []

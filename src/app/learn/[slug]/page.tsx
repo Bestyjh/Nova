@@ -9,6 +9,7 @@ import {
 import PortalHeader from "../../portal-header";
 import { createClient } from "@/lib/supabase/server";
 import { getPublishedCourseBySlug } from "@/lib/data/courses";
+import { getCompletedLessonIds } from "@/lib/data/progress";
 
 type PageProps = {
   params: Promise<{
@@ -38,11 +39,8 @@ export default async function CoursePage({
   let completedLessonIds = new Set<string>();
 
   if (userId) {
-    const { data: progress } = await supabase
-      .from("lesson_progress")
-      .select("lesson_id")
-      .eq("user_id", userId)
-      .eq("completed", true);
+    const { data: progress } =
+      await getCompletedLessonIds(supabase, userId);
 
     completedLessonIds = new Set(
       progress?.map((item) => item.lesson_id) ?? []

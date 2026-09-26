@@ -11,6 +11,7 @@ import {
 import PortalHeader from "@/app/portal-header";
 import { createClient } from "@/lib/supabase/server";
 import { getEnrollmentById } from "@/lib/data/enrollments";
+import { getCompletedLessonProgressWithDates } from "@/lib/data/progress";
 
 type PageProps = {
   params: Promise<{
@@ -91,15 +92,11 @@ export default async function EnrollmentPage({
   }
 
   // Completed lessons for this account.
-  const { data: progressRows } = await supabase
-    .from("lesson_progress")
-    .select(`
-      lesson_id,
-      completed,
-      completed_at
-    `)
-    .eq("user_id", enrollment.user_id)
-    .eq("completed", true);
+  const { data: progressRows } =
+    await getCompletedLessonProgressWithDates(
+      supabase,
+      enrollment.user_id
+    );
 
   const completedLessonIds = new Set(
     progressRows?.map((row) => row.lesson_id) ?? []
@@ -152,7 +149,7 @@ export default async function EnrollmentPage({
                 href="/admin/enrollments"
                 className="courseMeta"
               >
-                â† All Enrollments
+                Ã¢â€ Â All Enrollments
               </Link>
 
               <p
