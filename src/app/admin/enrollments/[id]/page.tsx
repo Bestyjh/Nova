@@ -10,6 +10,7 @@ import {
 
 import PortalHeader from "@/app/portal-header";
 import { createClient } from "@/lib/supabase/server";
+import { getEnrollmentById } from "@/lib/data/enrollments";
 
 type PageProps = {
   params: Promise<{
@@ -45,17 +46,7 @@ export default async function EnrollmentPage({
 
   // Enrollment
   const { data: enrollment, error: enrollmentError } =
-    await supabase
-      .from("enrollments")
-      .select(`
-        id,
-        user_id,
-        course_id,
-        status,
-        enrolled_at
-      `)
-      .eq("id", id)
-      .maybeSingle();
+    await getEnrollmentById(supabase, id);
 
   if (enrollmentError || !enrollment) {
     notFound();
@@ -161,7 +152,7 @@ export default async function EnrollmentPage({
                 href="/admin/enrollments"
                 className="courseMeta"
               >
-                ← All Enrollments
+                â† All Enrollments
               </Link>
 
               <p

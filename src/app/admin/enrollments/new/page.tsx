@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import PortalHeader from "@/app/portal-header";
 import { createClient } from "@/lib/supabase/server";
+import { getEnrollmentPairs } from "@/lib/data/enrollments";
 import { createEnrollment } from "../actions";
 import EnrollmentForm from "./enrollment-form";
 
@@ -60,9 +61,7 @@ export default async function NewEnrollmentPage() {
 const {
   data: existingEnrollments,
   error: enrollmentsError,
-} = await supabase
-  .from("enrollments")
-  .select("user_id, course_id");
+} = await getEnrollmentPairs(supabase);
 
 if (enrollmentsError) {
   throw new Error(
@@ -83,7 +82,7 @@ if (enrollmentsError) {
                 href="/admin/enrollments"
                 className="courseMeta"
               >
-                ← Back to Enrollments
+                â† Back to Enrollments
               </Link>
 
               <p

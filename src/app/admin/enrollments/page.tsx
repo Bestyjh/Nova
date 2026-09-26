@@ -9,6 +9,7 @@ import {
 
 import PortalHeader from "@/app/portal-header";
 import { createClient } from "@/lib/supabase/server";
+import { getAllEnrollments } from "@/lib/data/enrollments";
 
 export default async function EnrollmentsPage() {
   const supabase = await createClient();
@@ -33,18 +34,7 @@ export default async function EnrollmentsPage() {
   }
 
   const { data: enrollments, error: enrollmentsError } =
-  await supabase
-    .from("enrollments")
-    .select(`
-      id,
-      user_id,
-      course_id,
-      status,
-      enrolled_at
-    `)
-    .order("enrolled_at", {
-      ascending: false,
-    });
+    await getAllEnrollments(supabase);
 
 if (enrollmentsError) {
   throw new Error(enrollmentsError.message);
@@ -206,7 +196,7 @@ if (coursesError) {
           <div>
             <span className="courseMeta">
               {learner?.role ?? "unknown"}{" "}
-              · {record.status}
+              Â· {record.status}
             </span>
 
             <h3>{name}</h3>

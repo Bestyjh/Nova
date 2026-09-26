@@ -9,6 +9,7 @@ import {
 
 import PortalHeader from "@/app/portal-header";
 import { createClient } from "@/lib/supabase/server";
+import { getLearnerEnrollmentsWithCurriculum } from "@/lib/data/enrollments";
 
 type PageProps = {
   params: Promise<{
@@ -59,27 +60,10 @@ export default async function LearnerPage({
   }
 
   const { data: enrollments, error: enrollmentError } =
-    await supabase
-      .from("enrollments")
-      .select(`
-        id,
-        status,
-        enrolled_at,
-        course_id,
-        courses (
-          id,
-          title,
-          slug,
-          modules (
-            id,
-            lessons (
-              id,
-              published
-            )
-          )
-        )
-      `)
-      .eq("user_id", learner.id);
+    await getLearnerEnrollmentsWithCurriculum(
+      supabase,
+      learner.id
+    );
 
   if (enrollmentError) {
     throw new Error(enrollmentError.message);
@@ -173,7 +157,7 @@ export default async function LearnerPage({
                 href="/admin/learners"
                 className="courseMeta"
               >
-                ← All Learners
+                â† All Learners
               </Link>
 
               <p

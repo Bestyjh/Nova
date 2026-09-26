@@ -8,6 +8,7 @@ import {
 import PortalHeader from "../portal-header";
 import { requireUser } from "@/lib/auth/require-user";
 import { getProfileSummary } from "@/lib/data/profiles";
+import { getUserEnrollmentsWithCurriculum } from "@/lib/data/enrollments";
 
 export default async function Dashboard() {
   const { supabase, userId } = await requireUser();
@@ -19,29 +20,11 @@ export default async function Dashboard() {
   const firstName = profile?.first_name || "Learner";
 
   // Load enrollments together with course modules and lessons.
-  const { data: enrollments } = await supabase
-    .from("enrollments")
-    .select(`
-      id,
-      status,
-      enrolled_at,
-      courses (
-        id,
-        title,
-        slug,
-        summary,
-        modules (
-          id,
-          position,
-          lessons (
-            id,
-            position,
-            published
-          )
-        )
-      )
-    `)
-    .eq("user_id", userId);
+  const { data: enrollments } =
+    await getUserEnrollmentsWithCurriculum(
+      supabase,
+      userId
+    );
 
  const learningEnrollments =
   enrollments?.filter(
