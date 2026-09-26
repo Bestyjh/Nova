@@ -63,13 +63,11 @@ export async function createResource(
       "Invalid resource type."
     );
   }
-
-  const position =
-    Number.isFinite(positionValue) &&
-    positionValue >= 0
-      ? Math.floor(positionValue)
-      : 0;
-
+const position =
+  Number.isFinite(positionValue) &&
+  positionValue >= 0
+    ? Math.floor(positionValue)
+    : 0;
   const { error } = await supabase
     .from("resources")
     .insert({
@@ -93,6 +91,130 @@ export async function createResource(
 
     throw new Error(
       "Unable to create resource."
+    );
+  }
+
+  revalidatePath("/admin/resources");
+  revalidatePath("/resources");
+
+  redirect("/admin/resources");
+}
+export async function updateResource(
+  resourceId: string,
+  formData: FormData
+) {
+  const { supabase } = await requireAdmin();
+
+  const title = String(
+    formData.get("title") ?? ""
+  ).trim();
+
+  const description = String(
+    formData.get("description") ?? ""
+  ).trim();
+
+  const resourceType = String(
+    formData.get("resource_type") ?? ""
+  ).trim();
+
+  const url = String(
+    formData.get("url") ?? ""
+  ).trim();
+
+  const courseId = String(
+    formData.get("course_id") ?? ""
+  ).trim();
+
+  const positionValue = Number(
+    formData.get("position") ?? 0
+  );
+
+  const published =
+    formData.get("published") === "on";
+
+  if (!title) {
+    throw new Error(
+      "Resource title is required."
+    );
+  }
+
+  if (!url) {
+    throw new Error(
+      "Resource URL is required."
+    );
+  }
+
+  const allowedTypes = [
+    "document",
+    "video",
+    "website",
+    "download",
+    "other",
+  ];
+
+ if (!allowedTypes.includes(resourceType)) {
+  throw new Error(
+    "Invalid resource type."
+  );
+}
+
+const position =
+  Number.isFinite(positionValue) &&
+  positionValue >= 0
+    ? Math.floor(positionValue)
+    : 0;
+
+const { error } = await supabase
+  .from("resources")
+  .update({
+    title,
+    description: description || null,
+    resource_type: resourceType,
+    url,
+    course_id: courseId || null,
+    position,
+    published,
+    updated_at: new Date().toISOString(),
+  })
+  .eq("id", resourceId);
+if (error) {
+  console.error(
+    "Unable to update resource:",
+    error
+  );
+
+  throw new Error(
+    "Unable to update resource."
+  );
+}
+
+revalidatePath("/admin/resources");
+revalidatePath(
+  `/admin/resources/${resourceId}/edit`
+);
+revalidatePath("/resources");
+
+redirect("/admin/resources");
+}
+
+export async function deleteResource(
+  resourceId: string
+) {
+  const { supabase } = await requireAdmin();
+
+  const { error } = await supabase
+    .from("resources")
+    .delete()
+    .eq("id", resourceId);
+
+  if (error) {
+    console.error(
+      "Unable to delete resource:",
+      error
+    );
+
+    throw new Error(
+      "Unable to delete resource."
     );
   }
 

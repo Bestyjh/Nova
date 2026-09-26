@@ -179,14 +179,29 @@ export default async function AdminResourcesPage() {
                         </p>
                       </div>
 
-                      <a
-                        href={resource.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="button compact"
-                      >
-                        Open Resource
-                      </a>
+                   <div
+  style={{
+    display: "flex",
+    gap: "10px",
+    flexWrap: "wrap",
+  }}
+>
+  <Link
+    href={`/admin/resources/${resource.id}/edit`}
+    className="button"
+  >
+    Edit Resource
+  </Link>
+
+  <a
+    href={resource.url}
+    target="_blank"
+    rel="noreferrer"
+    className="button compact"
+  >
+    Open Resource
+  </a>
+</div>
                     </div>
                   </article>
                 ))}
