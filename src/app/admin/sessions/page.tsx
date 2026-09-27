@@ -179,6 +179,12 @@ export default async function AdminSessionsPage() {
       "General Session"
     : "General Session"}
 </p>
+<Link
+  href={`/admin/sessions/${session.id}/edit`}
+  className="button"
+>
+  Edit Session
+</Link>
                     </div>
                   </article>
                 );
