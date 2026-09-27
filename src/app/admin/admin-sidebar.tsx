@@ -18,6 +18,10 @@ export default function AdminSidebar() {
   Resources
 </Link>
 
+<Link href="/admin/sessions">
+  Sessions
+</Link>
+
         <Link href="/admin/learners">
           Learners
         </Link>

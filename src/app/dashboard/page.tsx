@@ -146,7 +146,9 @@ const certificateByEnrollment = new Map(
   Resources
 </Link>
 
-<span>Sessions</span>
+<Link href="/sessions">
+  Sessions
+</Link>
 <span>Profile</span>
           </nav>
         </aside>
