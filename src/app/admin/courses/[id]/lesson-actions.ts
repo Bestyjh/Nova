@@ -47,6 +47,20 @@ export async function updateLesson(
   const content =
     formData.get("content")?.toString().trim() ?? "";
 
+    const structuredContent = content
+  ? {
+      version: 1,
+      blocks: content
+        .split(/\n\s*\n/)
+        .map((paragraph) => paragraph.trim())
+        .filter(Boolean)
+        .map((text) => ({
+          type: "paragraph",
+          text,
+        })),
+    }
+  : null;
+
   const position = Number(
     formData.get("position")?.toString()
   );
@@ -100,7 +114,7 @@ export async function updateLesson(
     .update({
       title,
       kind,
-      content: content || null,
+      content: structuredContent,
       position,
       published,
     })
