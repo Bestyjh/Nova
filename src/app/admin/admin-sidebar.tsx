@@ -14,6 +14,10 @@ export default function AdminSidebar() {
           Courses
         </Link>
 
+        <Link href="/admin/assessments">
+  Assessments
+</Link>
+
         <Link href="/admin/resources">
   Resources
 </Link>

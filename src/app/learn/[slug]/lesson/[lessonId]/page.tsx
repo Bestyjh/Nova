@@ -11,6 +11,14 @@ import { createClient } from "@/lib/supabase/server";
 import CompleteLessonButton from "./complete-lesson-button";
 import LessonContent from "../../../lesson-content";
 
+import {
+  getPublishedAssessmentForLesson,
+  getPublishedAssessmentQuestions,
+  getLearnerAssessmentAttempts,
+} from "@/lib/data/learner-assessments";
+
+import { submitAssessment } from "./assessment-actions";
+
 type PageProps = {
   params: Promise<{
     slug: string;
@@ -178,9 +186,118 @@ export default async function LessonPage({
           (completedLessons / totalLessons) * 100
         );
 
-  const moduleData = Array.isArray(lesson.modules)
+   const moduleData = Array.isArray(lesson.modules)
     ? lesson.modules[0]
     : lesson.modules;
+
+  // Load the published assessment attached to this lesson.
+  const {
+    data: assessment,
+    error: assessmentError,
+  } = await getPublishedAssessmentForLesson(
+    supabase,
+    lesson.id
+  );
+
+  if (assessmentError) {
+    console.error(
+      "Unable to load lesson assessment:",
+      assessmentError
+    );
+  }
+
+  let assessmentAttempts: {
+    id: string;
+    assessment_id: string;
+    score: number | null;
+    passed: boolean | null;
+    completed_at: string | null;
+  }[] = [];
+
+  if (assessment) {
+    const {
+      data: attempts,
+      error: attemptsError,
+    } = await getLearnerAssessmentAttempts(
+      supabase,
+      assessment.id,
+      userId
+    );
+
+    if (attemptsError) {
+      console.error(
+        "Unable to load assessment attempts:",
+        attemptsError
+      );
+    } else {
+      assessmentAttempts = attempts ?? [];
+    }
+  }
+
+  const assessmentAttemptCount =
+    assessmentAttempts.length;
+
+    const latestAssessmentAttempt =
+    assessmentAttempts[0] ?? null;
+
+  const assessmentPassed =
+    assessmentAttempts.some(
+      (attempt) => attempt.passed === true
+    );
+
+  const assessmentAttemptsRemaining =
+    assessment?.max_attempts == null
+      ? null
+      : Math.max(
+          assessment.max_attempts -
+            assessmentAttemptCount,
+          0
+        );
+
+  let assessmentQuestions: {
+    id: string;
+    assessment_id: string;
+    question_text: string;
+    position: number;
+    options: unknown;
+    points: number;
+  }[] = [];
+
+  if (assessment) {
+    const {
+      data: questions,
+      error: questionsError,
+    } =
+      await getPublishedAssessmentQuestions(
+        supabase,
+        assessment.id
+      );
+
+    if (questionsError) {
+      console.error(
+        "Unable to load assessment questions:",
+        questionsError
+      );
+    } else {
+      assessmentQuestions = questions ?? [];
+    }
+  }
+
+  const questionIds =
+    assessmentQuestions.map(
+      (question) => question.id
+    );
+
+  const submitAssessmentAction =
+    assessment
+      ? submitAssessment.bind(
+          null,
+          assessment.id,
+          course.slug,
+          lesson.id,
+          questionIds
+        )
+      : null;
 
   return (
     <div className="learnPage">
@@ -269,6 +386,180 @@ export default async function LessonPage({
 />
             </div>
           </article>
+
+            {assessment && (
+              <section
+                className="learningPanel"
+                style={{ marginTop: "24px" }}
+              >
+                <span className="courseMeta">
+                  ASSESSMENT
+                </span>
+
+                <h2>{assessment.title}</h2>
+
+                {assessment.description && (
+                  <p>{assessment.description}</p>
+                )}
+
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "16px",
+                    flexWrap: "wrap",
+                    marginTop: "20px",
+                  }}
+                >
+                  <div className="statCard">
+                    <strong>
+                      {assessment.passing_score}%
+                    </strong>
+                    <span>Passing Score</span>
+                  </div>
+
+                  <div className="statCard">
+                    <strong>
+                      {assessmentAttemptCount}
+                    </strong>
+                    <span>
+                      {assessmentAttemptCount === 1
+                        ? "Attempt"
+                        : "Attempts"}
+                    </span>
+                  </div>
+
+                  <div className="statCard">
+                    <strong>
+                      {assessmentAttemptsRemaining === null
+                        ? "Unlimited"
+                        : assessmentAttemptsRemaining}
+                    </strong>
+                    <span>Attempts Remaining</span>
+                  </div>
+                </div>
+
+                {latestAssessmentAttempt && (
+                  <div style={{ marginTop: "20px" }}>
+                    <p>
+                      <strong>Latest Score:</strong>{" "}
+                      {latestAssessmentAttempt.score}%
+                    </p>
+
+                    <p>
+                      <strong>Result:</strong>{" "}
+                      {latestAssessmentAttempt.passed
+                        ? "Passed"
+                        : "Not Passed"}
+                    </p>
+                  </div>
+                )}
+
+                <div style={{ marginTop: "20px" }}>
+                {assessmentPassed ? (
+  <div>
+    <p>
+      <strong>✓ Assessment Passed</strong>
+    </p>
+
+    <p>
+      You have successfully completed this
+      assessment.
+    </p>
+  </div>
+) : assessmentAttemptsRemaining === 0 ? (
+  <p>
+    You have used all available attempts for
+    this assessment.
+  </p>
+) : assessmentQuestions.length === 0 ? (
+  <p>
+    No assessment questions are currently
+    available.
+  </p>
+) : submitAssessmentAction ? (
+  <form action={submitAssessmentAction}>
+    <div
+      style={{
+        display: "grid",
+        gap: "24px",
+      }}
+    >
+      {assessmentQuestions.map(
+        (question, index) => {
+          const options = Array.isArray(
+            question.options
+          )
+            ? question.options.filter(
+                (
+                  option
+                ): option is string =>
+                  typeof option === "string"
+              )
+            : [];
+
+          return (
+            <fieldset
+              key={question.id}
+              style={{
+                border: "1px solid #e2e8e5",
+                borderRadius: "12px",
+                padding: "20px",
+              }}
+            >
+              <legend>
+                <strong>
+                  Question {index + 1}
+                </strong>
+              </legend>
+
+              <p>
+                {question.question_text}
+              </p>
+
+              <div
+                style={{
+                  display: "grid",
+                  gap: "12px",
+                  marginTop: "16px",
+                }}
+              >
+                {options.map((option) => (
+                  <label
+                    key={option}
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name={`question_${question.id}`}
+                      value={option}
+                      required
+                    />
+
+                    <span>{option}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          );
+        }
+      )}
+
+      <button
+        type="submit"
+        className="button"
+      >
+        Submit Assessment
+      </button>
+    </div>
+  </form>
+) : null}
+                </div>
+              </section>
+            )}
 
           <div
             style={{
