@@ -98,17 +98,19 @@ const certificateByEnrollment = new Map(
             (completedLessons / totalLessons) * 100
           );
 
-    return {
-  enrollmentId: enrollment.id,
-  course,
-  totalLessons,
-  completedLessons,
-  progress,
-  certificate:
-    certificateByEnrollment.get(
-      enrollment.id
-    ) ?? null,
-};
+           return {
+      enrollmentId: enrollment.id,
+      enrollmentStatus: enrollment.status,
+      completedAt: enrollment.completed_at,
+      course,
+      totalLessons,
+      completedLessons,
+      progress,
+      certificate:
+        certificateByEnrollment.get(
+          enrollment.id
+        ) ?? null,
+    };
   })
   .filter(
     (
@@ -120,9 +122,7 @@ const certificateByEnrollment = new Map(
   const completedCourses =
     coursesWithProgress.filter(
       (item) =>
-        item &&
-        item.totalLessons > 0 &&
-        item.progress === 100
+        item.enrollmentStatus === "completed"
     ).length;
 
   return (
@@ -243,14 +243,26 @@ const certificateByEnrollment = new Map(
                   (item) => {
                     if (!item) return null;
 
-                   const {
+                  const {
   enrollmentId,
+  enrollmentStatus,
+  completedAt,
   course,
   completedLessons,
   totalLessons,
   progress,
   certificate,
 } = item;
+
+const completionDate =
+  enrollmentStatus === "completed" &&
+  completedAt
+    ? new Intl.DateTimeFormat("en-CA", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(new Date(completedAt))
+    : null;
 
                     return (
                       <article
@@ -320,6 +332,18 @@ const certificateByEnrollment = new Map(
                             </div>
                           </div>
 
+                          {completionDate && (
+                            <p
+                              style={{
+                                marginTop: "12px",
+                                marginBottom: 0,
+                              }}
+                            >
+                              <strong>Completed:</strong>{" "}
+                              {completionDate}
+                            </p>
+                          )}
+
                         <div
   style={{
     marginTop: "24px",
@@ -332,11 +356,11 @@ const certificateByEnrollment = new Map(
     href={`/learn/${course.slug}`}
     className="button"
   >
-    {progress === 100
-      ? "Review Course"
-      : progress > 0
-        ? "Continue Learning"
-        : "Start Learning"}
+    {enrollmentStatus === "completed"
+  ? "Review Course"
+  : progress > 0
+    ? "Continue Learning"
+    : "Start Learning"}
   </Link>
 
   {certificate && (

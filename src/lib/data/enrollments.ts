@@ -7,10 +7,11 @@ export async function getUserEnrollmentsWithCurriculum(
   return supabase
     .from("enrollments")
     .select(`
-      id,
-      status,
-      enrolled_at,
-      courses (
+  id,
+  status,
+  enrolled_at,
+  completed_at,
+  courses (
         id,
         title,
         slug,
@@ -69,11 +70,11 @@ export async function getLearnerEnrollmentsWithCurriculum(
 ) {
   return supabase
     .from("enrollments")
-    .select(`
+   .select(`
       id,
       status,
       enrolled_at,
-      course_id,
+      completed_at,
       courses (
         id,
         title,
