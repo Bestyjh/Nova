@@ -59,7 +59,9 @@ export default async function SessionsPage() {
               Sessions
             </Link>
 
-            <span>Profile</span>
+           <Link href="/profile">
+  Profile
+</Link>
           </nav>
         </aside>
 

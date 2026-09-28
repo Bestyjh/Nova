@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Download,
   ExternalLink,
@@ -47,20 +48,25 @@ export default async function ResourcesPage() {
           <h3>Learner Portal</h3>
 
           <nav>
-            <a href="/dashboard">
-              Overview
-            </a>
+           <Link href="/dashboard">
+  Overview
+</Link>
 
-            <a href="/learn">
-              My Learning
-            </a>
+<Link href="/learn">
+  My Learning
+</Link>
 
-            <a href="/resources">
-              Resources
-            </a>
+<Link href="/resources">
+  Resources
+</Link>
 
-            <span>Sessions</span>
-            <span>Profile</span>
+<Link href="/sessions">
+  Sessions
+</Link>
+
+<Link href="/profile">
+  Profile
+</Link>
           </nav>
         </aside>
 
