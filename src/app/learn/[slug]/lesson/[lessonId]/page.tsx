@@ -175,6 +175,35 @@ export default async function LessonPage({
   const completed =
     completedLessonIds.has(lesson.id);
 
+   // Require learners to complete all previous lessons
+// before accessing a later lesson.
+const previousLessonIds = orderedLessons
+  .slice(0, currentIndex)
+  .map((item) => item.id);
+
+const previousLessonsCompleted =
+  previousLessonIds.every((id) =>
+    completedLessonIds.has(id)
+  );
+
+if (!previousLessonsCompleted) {
+  const firstIncompletePreviousLesson =
+    orderedLessons
+      .slice(0, currentIndex)
+      .find(
+        (item) =>
+          !completedLessonIds.has(item.id)
+      );
+
+  if (firstIncompletePreviousLesson) {
+    redirect(
+      `/learn/${course.slug}/lesson/${firstIncompletePreviousLesson.id}`
+    );
+  }
+
+  redirect(`/learn/${course.slug}`);
+} 
+
   const totalLessons = orderedLessons.length;
   const completedLessons =
     completedLessonIds.size;
