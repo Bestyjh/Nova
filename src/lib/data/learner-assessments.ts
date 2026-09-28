@@ -24,7 +24,7 @@ export async function getPublishedAssessmentQuestions(
   assessmentId: string
 ) {
   return supabase
-    .from("assessment_questions")
+    .from("learner_assessment_questions")
     .select(`
       id,
       assessment_id,

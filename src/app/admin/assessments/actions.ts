@@ -30,9 +30,6 @@ export async function createAssessment(
     formData.get("max_attempts") ?? ""
   ).trim();
 
-  const published =
-    formData.get("published") === "on";
-
   if (!lessonId) {
     throw new Error(
       "A lesson is required."
@@ -93,14 +90,14 @@ export async function createAssessment(
     await supabase
       .from("assessments")
       .insert({
-        lesson_id: lessonId,
-        title,
-        description:
-          description || null,
-        passing_score: passingScore,
-        max_attempts: maxAttempts,
-        published,
-      })
+  lesson_id: lessonId,
+  title,
+  description:
+    description || null,
+  passing_score: passingScore,
+  max_attempts: maxAttempts,
+  published: false,
+})
       .select("id")
       .single();
 
@@ -491,6 +488,38 @@ export async function updateAssessment(
       })
       .eq("assessment_id", assessmentId);
 
+if (published) {
+  const {
+    data: existingPublishedAssessment,
+    error: publishedAssessmentError,
+  } = await supabase
+    .from("assessments")
+    .select("id, title")
+    .eq("lesson_id", lessonId)
+    .eq("published", true)
+    .neq("id", assessmentId)
+    .maybeSingle();
+
+  if (publishedAssessmentError) {
+    console.error(
+      "Unable to verify published assessment:",
+      publishedAssessmentError
+    );
+
+    throw new Error(
+      "Unable to verify whether this lesson already has a published assessment."
+    );
+  }
+
+ if (existingPublishedAssessment) {
+  redirect(
+    `/admin/assessments/${assessmentId}/edit?error=${encodeURIComponent(
+      "This lesson already has a published assessment. Unpublish it before publishing another assessment."
+    )}`
+  );
+}
+}
+
     if (questionError) {
       console.error(
         "Unable to verify assessment questions:",
@@ -512,6 +541,8 @@ export async function updateAssessment(
   const { error } = await supabase
     .from("assessments")
     .update({
+
+
       lesson_id: lessonId,
       title,
       description:
@@ -523,17 +554,24 @@ export async function updateAssessment(
     })
     .eq("id", assessmentId);
 
-  if (error) {
-    console.error(
-      "Unable to update assessment:",
-      error
-    );
-
-    throw new Error(
-      "Unable to update assessment."
+if (error) {
+  if (error.code === "23505") {
+    redirect(
+      `/admin/assessments/${assessmentId}/edit?error=${encodeURIComponent(
+        "This lesson already has a published assessment. Unpublish it before publishing another assessment."
+      )}`
     );
   }
 
+  console.error(
+    "Unable to update assessment:",
+    error
+  );
+
+  throw new Error(
+    "Unable to update assessment."
+  );
+}
   revalidatePath("/admin/assessments");
 
   revalidatePath(
@@ -567,16 +605,22 @@ export async function deleteAssessment(
     .delete()
     .eq("id", assessmentId);
 
-  if (error) {
-    console.error(
-      "Unable to delete assessment:",
-      error
-    );
-
+ if (error) {
+  if (error.code === "23505") {
     throw new Error(
-      "Unable to delete assessment."
+      "This lesson already has a published assessment. Unpublish it before publishing another assessment."
     );
   }
+
+  console.error(
+    "Unable to update assessment:",
+    error
+  );
+
+  throw new Error(
+    "Unable to update assessment."
+  );
+}
 
   revalidatePath("/admin/assessments");
   revalidatePath("/learn");

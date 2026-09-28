@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import DeleteAssessmentButton from "./delete-assessment-button";
 import AdminSidebar from "../../../admin-sidebar";
 import PortalHeader from "../../../../portal-header";
 import { requireAdmin } from "@/lib/auth/require-admin";
@@ -14,12 +15,17 @@ type PageProps = {
   params: Promise<{
     id: string;
   }>;
+  searchParams: Promise<{
+    error?: string;
+  }>;
 };
 
 export default async function EditAssessmentPage({
   params,
+  searchParams,
 }: PageProps) {
   const { id } = await params;
+  const { error: errorMessage } = await searchParams;
 
   const { supabase } = await requireAdmin();
 
@@ -67,6 +73,12 @@ export default async function EditAssessmentPage({
       assessment.id
     );
 
+    const deleteAssessmentAction =
+  deleteAssessment.bind(
+    null,
+    assessment.id
+  );
+
   return (
     <div className="authPage">
       <PortalHeader />
@@ -103,6 +115,15 @@ export default async function EditAssessmentPage({
             </p>
 
             <h2>{assessment.title}</h2>
+{errorMessage && (
+  <p
+    className="authError"
+    role="alert"
+    style={{ marginBottom: "20px" }}
+  >
+    {errorMessage}
+  </p>
+)}
 
             <form
               action={updateAssessmentAction}
@@ -281,19 +302,9 @@ export default async function EditAssessmentPage({
     answers.
   </p>
 
-  <form
-    action={deleteAssessment.bind(
-      null,
-      assessment.id
-    )}
-  >
-    <button
-      type="submit"
-      className="button"
-    >
-      Delete Assessment
-    </button>
-  </form>
+ <DeleteAssessmentButton
+  action={deleteAssessmentAction}
+/>
 </div>
           </section>
         </section>

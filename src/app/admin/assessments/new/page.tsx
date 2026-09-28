@@ -212,13 +212,10 @@ export default async function NewAssessmentPage() {
                   </small>
                 </div>
 
-                <label>
-                  <input
-                    type="checkbox"
-                    name="published"
-                  />{" "}
-                  Publish this assessment
-                </label>
+                <p>
+  New assessments are created as drafts. Add at
+  least one question before publishing.
+</p>
 
                 <div
                   style={{
