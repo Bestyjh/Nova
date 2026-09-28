@@ -86,6 +86,74 @@ export async function completeLesson(
     };
   }
 
+    // Require all published assessments for this lesson
+  // to be passed before the lesson can be completed.
+  const {
+    data: requiredAssessments,
+    error: assessmentError,
+  } = await supabase
+    .from("assessments")
+    .select("id, title")
+    .eq("lesson_id", lessonId)
+    .eq("published", true);
+
+  if (assessmentError) {
+    return {
+      success: false,
+      courseCompleted: false,
+      error: assessmentError.message,
+    };
+  }
+
+  if (
+    requiredAssessments &&
+    requiredAssessments.length > 0
+  ) {
+    const assessmentIds = requiredAssessments.map(
+      (assessment) => assessment.id
+    );
+
+    const {
+      data: passedAttempts,
+      error: attemptsError,
+    } = await supabase
+      .from("assessment_attempts")
+      .select("assessment_id")
+      .eq("user_id", userId)
+      .eq("passed", true)
+      .in("assessment_id", assessmentIds);
+
+    if (attemptsError) {
+      return {
+        success: false,
+        courseCompleted: false,
+        error: attemptsError.message,
+      };
+    }
+
+    const passedAssessmentIds = new Set(
+      (passedAttempts ?? []).map(
+        (attempt) => attempt.assessment_id
+      )
+    );
+
+    const allAssessmentsPassed =
+      assessmentIds.every((assessmentId) =>
+        passedAssessmentIds.has(assessmentId)
+      );
+
+    if (!allAssessmentsPassed) {
+      return {
+        success: false,
+        courseCompleted: false,
+        error:
+          "You must pass the required assessment before completing this lesson.",
+      };
+    }
+  }
+
+  // Record lesson completion.
+
   // Record lesson completion.
   const { error: progressError } = await supabase
     .from("lesson_progress")
