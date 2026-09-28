@@ -4,6 +4,7 @@ import { CheckCircle2 } from "lucide-react";
 
 import PortalHeader from "../../../portal-header";
 import { createClient } from "@/lib/supabase/server";
+import { getCertificateByEnrollment } from "@/lib/data/certificates";
 
 type PageProps = {
   params: Promise<{
@@ -100,10 +101,25 @@ export default async function CompletionPage({
     .eq("id", userId)
     .maybeSingle();
 
-  const learnerName =
+    const learnerName =
     [profile?.first_name, profile?.last_name]
       .filter(Boolean)
       .join(" ") || "NOVA Learner";
+
+  const {
+    data: certificate,
+    error: certificateError,
+  } = await getCertificateByEnrollment(
+    supabase,
+    enrollment.id
+  );
+
+  if (certificateError) {
+    console.error(
+      "Unable to load learner certificate:",
+      certificateError
+    );
+  }
 
   const completionDate = completedAt
     ? new Intl.DateTimeFormat("en-CA", {
@@ -176,7 +192,7 @@ export default async function CompletionPage({
                 {completionDate}
               </p>
 
-              <div
+                         <div
                 style={{
                   display: "flex",
                   justifyContent: "center",
@@ -185,6 +201,15 @@ export default async function CompletionPage({
                   marginTop: "28px",
                 }}
               >
+                {certificate && (
+                  <Link
+                    href={`/certificates/${certificate.id}`}
+                    className="button"
+                  >
+                    View Certificate
+                  </Link>
+                )}
+
                 <Link
                   href={`/learn/${course.slug}`}
                   className="button"
@@ -206,8 +231,9 @@ export default async function CompletionPage({
                   opacity: 0.7,
                 }}
               >
-                This completion record can be used for
-                future certificate functionality.
+                {certificate
+                  ? `Certificate ${certificate.certificate_number} has been issued for this completion.`
+                  : "Your course completion has been recorded. A certificate will appear here when it is issued by NOVA."}
               </p>
             </div>
           </article>
