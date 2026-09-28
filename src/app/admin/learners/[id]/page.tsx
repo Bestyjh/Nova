@@ -139,7 +139,7 @@ export default async function LearnerPage({
                 href="/admin/learners"
                 className="courseMeta"
               >
-                ÃƒÂ¢Ã¢â‚¬Â Ã‚Â All Learners
+                ← All Learners
               </Link>
 
               <p

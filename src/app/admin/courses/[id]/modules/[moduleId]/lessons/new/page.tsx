@@ -62,7 +62,7 @@ export default async function NewLessonPage({
                 href={`/admin/courses/${course.id}`}
                 className="courseMeta"
               >
-                â† Back to Course
+                ← Back to Course
               </Link>
 
               <p
@@ -75,7 +75,7 @@ export default async function NewLessonPage({
               <h1>Add Lesson</h1>
 
               <p>
-                {moduleRecord.title} Â· {course.title}
+                {moduleRecord.title} · {course.title}
               </p>
             </div>
           </div>

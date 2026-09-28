@@ -130,7 +130,7 @@ export default async function EnrollmentPage({
                 href="/admin/enrollments"
                 className="courseMeta"
               >
-                ÃƒÂ¢Ã¢â‚¬Â Ã‚Â All Enrollments
+                ← All Enrollments
               </Link>
 
               <p

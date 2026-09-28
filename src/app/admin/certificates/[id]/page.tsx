@@ -108,7 +108,7 @@ export default async function CertificatePage({
                 href={`/admin/completions/${certificate.enrollment_id}`}
                 className="courseMeta"
               >
-                Ã¢â€ Â Completion Record
+                ← Completion Record
               </Link>
 
               <p
@@ -141,7 +141,7 @@ export default async function CertificatePage({
     href={`/admin/completions/${certificate.enrollment_id}`}
     className="button compact"
   >
-    Ã¢â€ Â Back to Completion
+    ← Back to Completion
   </Link>
 
   <PrintCertificateButton />

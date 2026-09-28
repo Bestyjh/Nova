@@ -5,7 +5,10 @@ import AdminSidebar from "../../../admin-sidebar";
 import PortalHeader from "../../../../portal-header";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { getAdminAssessmentById } from "@/lib/data/assessments";
-import { updateAssessment } from "../../actions";
+import {
+  deleteAssessment,
+  updateAssessment,
+} from "../../actions";
 
 type PageProps = {
   params: Promise<{
@@ -263,6 +266,35 @@ export default async function EditAssessmentPage({
                 </Link>
               </div>
             </form>
+            <div
+  style={{
+    marginTop: "32px",
+    paddingTop: "24px",
+    borderTop: "1px solid #ddd",
+  }}
+>
+  <h3>Delete Assessment</h3>
+
+  <p>
+    Permanently delete this assessment, including
+    its questions, learner attempts, and submitted
+    answers.
+  </p>
+
+  <form
+    action={deleteAssessment.bind(
+      null,
+      assessment.id
+    )}
+  >
+    <button
+      type="submit"
+      className="button"
+    >
+      Delete Assessment
+    </button>
+  </form>
+</div>
           </section>
         </section>
       </main>

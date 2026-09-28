@@ -176,7 +176,7 @@ if (coursesError) {
           <div>
             <span className="courseMeta">
               {learner?.role ?? "unknown"}{" "}
-              Ã‚Â· {record.status}
+              ·{record.status}
             </span>
 
             <h3>{name}</h3>

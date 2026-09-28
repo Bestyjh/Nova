@@ -188,7 +188,7 @@ if (certificateError) {
                 href="/admin/completions"
                 className="courseMeta"
               >
-                Ã¢â€ Â All Completions
+                ← All Completions
               </Link>
 
               <p

@@ -546,3 +546,41 @@ export async function updateAssessment(
     `/admin/assessments/${assessmentId}`
   );
 }
+export async function deleteAssessment(
+  assessmentId: string
+) {
+  const { supabase } = await requireAdmin();
+
+  const { data: assessment, error: lookupError } =
+    await supabase
+      .from("assessments")
+      .select("id, lesson_id")
+      .eq("id", assessmentId)
+      .maybeSingle();
+
+  if (lookupError || !assessment) {
+    throw new Error("Assessment not found.");
+  }
+
+  const { error } = await supabase
+    .from("assessments")
+    .delete()
+    .eq("id", assessmentId);
+
+  if (error) {
+    console.error(
+      "Unable to delete assessment:",
+      error
+    );
+
+    throw new Error(
+      "Unable to delete assessment."
+    );
+  }
+
+  revalidatePath("/admin/assessments");
+  revalidatePath("/learn");
+  revalidatePath("/dashboard");
+
+  redirect("/admin/assessments");
+}

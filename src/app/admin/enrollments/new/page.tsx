@@ -62,7 +62,7 @@ if (enrollmentsError) {
                 href="/admin/enrollments"
                 className="courseMeta"
               >
-                Ã¢â€ Â Back to Enrollments
+                ← Back to Enrollments
               </Link>
 
               <p

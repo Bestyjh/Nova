@@ -45,7 +45,7 @@ export default async function EditCoursePage({
                 href={`/admin/courses/${course.id}`}
                 className="courseMeta"
               >
-                â† Back to Course
+                ← Back to Course
               </Link>
 
               <p

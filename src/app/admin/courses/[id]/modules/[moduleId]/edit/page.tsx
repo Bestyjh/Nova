@@ -69,7 +69,7 @@ export default async function EditModulePage({
                 href={`/admin/courses/${course.id}`}
                 className="courseMeta"
               >
-                â† Back to Course
+                ← Back to Course
               </Link>
 
               <p

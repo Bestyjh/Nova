@@ -124,7 +124,7 @@ export default async function LearnerCertificatePage({
               href="/dashboard"
               className="courseMeta"
             >
-              â† Learner Dashboard
+            ← Learner Dashboard
             </Link>
 
             <p
@@ -156,7 +156,7 @@ export default async function LearnerCertificatePage({
             href="/dashboard"
             className="button compact"
           >
-            â† Back to Dashboard
+            ← Back to Dashboard
           </Link>
 
           <PrintCertificateButton />

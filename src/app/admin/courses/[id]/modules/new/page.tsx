@@ -42,7 +42,7 @@ export default async function NewModulePage({
                 href={`/admin/courses/${course.id}`}
                 className="courseMeta"
               >
-                â† Back to Course
+                ← Back to Course
               </Link>
 
               <p

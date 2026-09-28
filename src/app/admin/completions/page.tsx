@@ -279,7 +279,7 @@ export default async function CompletionsPage() {
                           <span className="courseMeta">
                             {record.profile?.role ??
                               "unknown"}{" "}
-                            Â· completed
+                            · completed
                           </span>
 
                           <h3>

@@ -292,7 +292,7 @@ export default async function AdminCoursePage({
                                 </strong>
 
                                 <div className="courseMeta">
-                                  {lesson.kind} Ã‚Â·{" "}
+                                  {lesson.kind} ·{" "}
                                   {lesson.published
                                     ? "Published"
                                     : "Draft"}
