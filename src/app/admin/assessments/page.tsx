@@ -106,13 +106,24 @@ export default async function AdminAssessmentsPage() {
             <div className="courseGrid">
               {assessmentList.map(
                 (assessment) => {
-                  const lessonTitle =
-                    Array.isArray(
-                      assessment.lessons
-                    )
-                      ? assessment.lessons[0]
-                          ?.title
-                      : null;
+                 const lessonRelation = assessment.lessons as
+  | {
+      id: string;
+      title: string;
+      module_id: string | null;
+    }
+  | {
+      id: string;
+      title: string;
+      module_id: string | null;
+    }[]
+  | null;
+
+const lesson = Array.isArray(lessonRelation)
+  ? lessonRelation[0] ?? null
+  : lessonRelation;
+
+const lessonTitle = lesson?.title ?? "Unknown Lesson";
 
                   return (
                     <article
