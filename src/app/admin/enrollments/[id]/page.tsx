@@ -12,6 +12,7 @@ import PortalHeader from "@/app/portal-header";
 import { getEnrollmentById } from "@/lib/data/enrollments";
 import { getCompletedLessonProgressWithDates } from "@/lib/data/progress";
 import { requireAdmin } from "@/lib/auth/require-admin";
+import EnrollmentActions from "./enrollment-actions";
 
 type PageProps = {
   params: Promise<{
@@ -217,6 +218,10 @@ export default async function EnrollmentPage({
                 ).toLocaleDateString()}
               </p>
             </div>
+            <EnrollmentActions
+  enrollmentId={enrollment.id}
+  status={enrollment.status}
+/>
           </section>
 
           <section
