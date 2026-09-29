@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { completeLesson } from "./actions";
@@ -10,6 +10,7 @@ type Props = {
   courseSlug: string;
   completed: boolean;
   nextLessonId?: string | null;
+  canComplete: boolean;
 };
 
 export default function CompleteLessonButton({
@@ -17,6 +18,7 @@ export default function CompleteLessonButton({
   courseSlug,
   completed,
   nextLessonId,
+  canComplete,
 }: Props) {
   const router = useRouter();
 
@@ -31,6 +33,12 @@ export default function CompleteLessonButton({
 
   const [error, setError] =
     useState("");
+
+  useEffect(() => {
+    if (canComplete) {
+      setError("");
+    }
+  }, [canComplete]);
 
   async function markComplete() {
     setLoading(true);

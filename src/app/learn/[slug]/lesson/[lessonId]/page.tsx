@@ -263,13 +263,14 @@ if (!previousLessonsCompleted) {
     }
   }
 
-  const assessmentAttemptCount =
+    const assessmentAttemptCount =
     assessmentAttempts.length;
 
-    const latestAssessmentAttempt =
+  const latestAssessmentAttempt =
     assessmentAttempts[0] ?? null;
 
   const assessmentPassed =
+    !assessment ||
     assessmentAttempts.some(
       (attempt) => attempt.passed === true
     );
@@ -411,7 +412,7 @@ if (!previousLessonsCompleted) {
   courseSlug={course.slug}
   completed={completed}
   nextLessonId={nextLesson?.id ?? null}
-
+  canComplete={assessmentPassed}
 />
             </div>
           </article>
