@@ -43,7 +43,10 @@ export async function cancelEnrollment(
     };
   }
 
-  const { error: updateError } = await supabase
+  const {
+    data: updatedEnrollment,
+    error: updateError,
+  } = await supabase
     .from("enrollments")
     .update({
       status: "cancelled",
@@ -51,12 +54,22 @@ export async function cancelEnrollment(
       completed_at: null,
     })
     .eq("id", enrollmentId)
-    .eq("status", "active");
+    .eq("status", "active")
+    .select("id")
+    .maybeSingle();
 
   if (updateError) {
     return {
       success: false,
       error: updateError.message,
+    };
+  }
+
+  if (!updatedEnrollment) {
+    return {
+      success: false,
+      error:
+        "Enrollment status changed before cancellation could be completed. Refresh and try again.",
     };
   }
 
@@ -109,7 +122,10 @@ export async function reactivateEnrollment(
     };
   }
 
-  const { error: updateError } = await supabase
+   const {
+    data: updatedEnrollment,
+    error: updateError,
+  } = await supabase
     .from("enrollments")
     .update({
       status: "active",
@@ -117,12 +133,22 @@ export async function reactivateEnrollment(
       completed_at: null,
     })
     .eq("id", enrollmentId)
-    .eq("status", "cancelled");
+    .eq("status", "cancelled")
+    .select("id")
+    .maybeSingle();
 
   if (updateError) {
     return {
       success: false,
       error: updateError.message,
+    };
+  }
+
+  if (!updatedEnrollment) {
+    return {
+      success: false,
+      error:
+        "Enrollment status changed before reactivation could be completed. Refresh and try again.",
     };
   }
 
