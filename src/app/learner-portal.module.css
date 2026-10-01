@@ -747,3 +747,13 @@
     width: 100%;
   }
 }
+.resourceVisual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resourceVisual svg {
+  width: 42px;
+  height: 42px;
+}
