@@ -320,7 +320,10 @@ export async function updateAssessmentQuestion(
     );
   }
 
-  const { error } = await supabase
+    const {
+    data: updatedQuestion,
+    error,
+  } = await supabase
     .from("assessment_questions")
     .update({
       question_text: questionText,
@@ -331,7 +334,9 @@ export async function updateAssessmentQuestion(
       updated_at: new Date().toISOString(),
     })
     .eq("id", questionId)
-    .eq("assessment_id", assessmentId);
+    .eq("assessment_id", assessmentId)
+    .select("id")
+    .maybeSingle();
 
   if (error) {
     console.error(
@@ -341,6 +346,12 @@ export async function updateAssessmentQuestion(
 
     throw new Error(
       "Unable to update assessment question."
+    );
+  }
+
+  if (!updatedQuestion) {
+    throw new Error(
+      "Assessment question not found or no longer belongs to this assessment."
     );
   }
 
@@ -362,11 +373,16 @@ export async function deleteAssessmentQuestion(
 ) {
   const { supabase } = await requireAdmin();
 
-  const { error } = await supabase
+   const {
+    data: deletedQuestion,
+    error,
+  } = await supabase
     .from("assessment_questions")
     .delete()
     .eq("id", questionId)
-    .eq("assessment_id", assessmentId);
+    .eq("assessment_id", assessmentId)
+    .select("id")
+    .maybeSingle();
 
   if (error) {
     console.error(
@@ -376,6 +392,12 @@ export async function deleteAssessmentQuestion(
 
     throw new Error(
       "Unable to delete assessment question."
+    );
+  }
+
+  if (!deletedQuestion) {
+    throw new Error(
+      "Assessment question not found or no longer belongs to this assessment."
     );
   }
 
@@ -472,9 +494,10 @@ export async function updateAssessment(
     );
   }
 
-  /*
-   * Do not allow an empty assessment to be
-   * published.
+   /*
+   * A published assessment must contain at least
+   * one question and must be the only published
+   * assessment assigned to its lesson.
    */
   if (published) {
     const {
@@ -487,38 +510,6 @@ export async function updateAssessment(
         head: true,
       })
       .eq("assessment_id", assessmentId);
-
-if (published) {
-  const {
-    data: existingPublishedAssessment,
-    error: publishedAssessmentError,
-  } = await supabase
-    .from("assessments")
-    .select("id, title")
-    .eq("lesson_id", lessonId)
-    .eq("published", true)
-    .neq("id", assessmentId)
-    .maybeSingle();
-
-  if (publishedAssessmentError) {
-    console.error(
-      "Unable to verify published assessment:",
-      publishedAssessmentError
-    );
-
-    throw new Error(
-      "Unable to verify whether this lesson already has a published assessment."
-    );
-  }
-
- if (existingPublishedAssessment) {
-  redirect(
-    `/admin/assessments/${assessmentId}/edit?error=${encodeURIComponent(
-      "This lesson already has a published assessment. Unpublish it before publishing another assessment."
-    )}`
-  );
-}
-}
 
     if (questionError) {
       console.error(
@@ -536,42 +527,80 @@ if (published) {
         "Add at least one question before publishing this assessment."
       );
     }
+
+    const {
+      data: existingPublishedAssessment,
+      error: publishedAssessmentError,
+    } = await supabase
+      .from("assessments")
+      .select("id")
+      .eq("lesson_id", lessonId)
+      .eq("published", true)
+      .neq("id", assessmentId)
+      .maybeSingle();
+
+    if (publishedAssessmentError) {
+      console.error(
+        "Unable to verify published assessment:",
+        publishedAssessmentError
+      );
+
+      throw new Error(
+        "Unable to verify whether this lesson already has a published assessment."
+      );
+    }
+
+    if (existingPublishedAssessment) {
+      redirect(
+        `/admin/assessments/${assessmentId}/edit?error=${encodeURIComponent(
+          "This lesson already has a published assessment. Unpublish it before publishing another assessment."
+        )}`
+      );
+    }
   }
 
-  const { error } = await supabase
+  const {
+    data: updatedAssessment,
+    error,
+  } = await supabase
     .from("assessments")
     .update({
-
-
       lesson_id: lessonId,
       title,
-      description:
-        description || null,
+      description: description || null,
       passing_score: passingScore,
       max_attempts: maxAttempts,
       published,
       updated_at: new Date().toISOString(),
     })
-    .eq("id", assessmentId);
+    .eq("id", assessmentId)
+    .select("id")
+    .maybeSingle();
 
-if (error) {
-  if (error.code === "23505") {
-    redirect(
-      `/admin/assessments/${assessmentId}/edit?error=${encodeURIComponent(
-        "This lesson already has a published assessment. Unpublish it before publishing another assessment."
-      )}`
+  if (error) {
+    if (error.code === "23505") {
+      redirect(
+        `/admin/assessments/${assessmentId}/edit?error=${encodeURIComponent(
+          "This lesson already has a published assessment. Unpublish it before publishing another assessment."
+        )}`
+      );
+    }
+
+    console.error(
+      "Unable to update assessment:",
+      error
+    );
+
+    throw new Error(
+      "Unable to update assessment."
     );
   }
 
-  console.error(
-    "Unable to update assessment:",
-    error
-  );
-
-  throw new Error(
-    "Unable to update assessment."
-  );
-}
+  if (!updatedAssessment) {
+    throw new Error(
+      "Assessment not found or no longer available."
+    );
+  }
   revalidatePath("/admin/assessments");
 
   revalidatePath(
