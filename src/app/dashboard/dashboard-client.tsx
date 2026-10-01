@@ -1,22 +1,18 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
   Award,
   BookOpen,
-  CalendarDays,
   CheckCircle2,
   ChevronRight,
-  FolderOpen,
-  LayoutDashboard,
   Search,
   UserRound,
 } from "lucide-react";
 
-import LogoutButton from "../logout-button";
-import styles from "./dashboard.module.css";
+import LearnerPortalShell from "../learner-portal-shell";
+import styles from "../learner-portal.module.css";
 
 type DashboardCourse = {
   enrollmentId: string;
@@ -70,151 +66,16 @@ export default function DashboardClient({
     });
   }, [courses, searchQuery]);
 
-  const initials = firstName
-    .trim()
-    .slice(0, 2)
-    .toUpperCase();
-
   const accountRole =
     role === "admin" ? "Admin" : "Learner";
 
   return (
-    <div className={styles.dashboardPage}>
-      <header className={styles.topbar}>
-        <Link
-          href="/"
-          className={styles.brand}
-          aria-label="NOVA Wellness & Lifestyle Institute"
-        >
-          <Image
-            src="/nova-logo.png"
-            alt="NOVA Wellness & Lifestyle Institute"
-            width={190}
-            height={54}
-            priority
-          />
-        </Link>
-
-        <label className={styles.searchBox}>
-          <Search
-            size={19}
-            aria-hidden="true"
-          />
-
-          <span className={styles.srOnly}>
-            Search your learning
-          </span>
-
-          <input
-            type="search"
-            value={searchQuery}
-            onChange={(event) =>
-              setSearchQuery(event.target.value)
-            }
-            placeholder="Search your learning"
-          />
-        </label>
-
-        <div className={styles.accountArea}>
-          <Link
-            href="/profile"
-            className={styles.profileLink}
-          >
-            <span className={styles.avatar}>
-              {initials || "NL"}
-            </span>
-
-            <span className={styles.profileCopy}>
-              <strong>{firstName}</strong>
-              <small>{accountRole}</small>
-            </span>
-          </Link>
-
-          <span
-            className={styles.accountDivider}
-            aria-hidden="true"
-          />
-
-          <div className={styles.logoutWrap}>
-            <LogoutButton />
-          </div>
-        </div>
-      </header>
-
-      <div className={styles.dashboardLayout}>
-        <aside className={styles.sidebar}>
-          <nav
-            className={styles.sidebarNav}
-            aria-label="Learner portal"
-          >
-            <Link
-              href="/dashboard"
-              className={styles.activeNavItem}
-              aria-current="page"
-            >
-              <LayoutDashboard
-                size={19}
-                aria-hidden="true"
-              />
-              Overview
-            </Link>
-
-            <Link
-              href="/learn"
-              className={styles.navItem}
-            >
-              <BookOpen
-                size={19}
-                aria-hidden="true"
-              />
-              My Learning
-            </Link>
-
-            <Link
-              href="/resources"
-              className={styles.navItem}
-            >
-              <FolderOpen
-                size={19}
-                aria-hidden="true"
-              />
-              Resources
-            </Link>
-
-            <Link
-              href="/sessions"
-              className={styles.navItem}
-            >
-              <CalendarDays
-                size={19}
-                aria-hidden="true"
-              />
-              Sessions
-            </Link>
-
-            <Link
-              href="/profile"
-              className={styles.navItem}
-            >
-              <UserRound
-                size={19}
-                aria-hidden="true"
-              />
-              Profile
-            </Link>
-          </nav>
-
-          <div className={styles.sidebarHelp}>
-            <strong>NOVA Learning</strong>
-            <p>
-              Your learning pathways, resources,
-              sessions and achievements in one
-              place.
-            </p>
-          </div>
-        </aside>
-
-        <main className={styles.main}>
+  <LearnerPortalShell
+    firstName={firstName}
+    role={role}
+    searchQuery={searchQuery}
+    onSearchQueryChange={setSearchQuery}
+  >
           <section className={styles.welcomeBlock}>
             <h1>Welcome, {firstName}</h1>
 
@@ -521,9 +382,7 @@ export default function DashboardClient({
                 )}
               </div>
             )}
-          </section>
-        </main>
-      </div>
-    </div>
-  );
+              </section>
+  </LearnerPortalShell>
+);
 }
