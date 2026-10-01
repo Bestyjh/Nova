@@ -3,21 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/auth/require-user";
 
 export async function updateProfile(
   formData: FormData
 ) {
-  const supabase = await createClient();
-
-  const { data: claimsData, error: claimsError } =
-    await supabase.auth.getClaims();
-
-  const userId = claimsData?.claims?.sub;
-
-  if (claimsError || !userId) {
-    redirect("/login");
-  }
+  const { supabase, userId } =
+    await requireUser();
 
   const firstName = String(
     formData.get("first_name") ?? ""
@@ -39,13 +31,18 @@ export async function updateProfile(
     );
   }
 
-  const { error } = await supabase
+  const {
+    data: updatedProfile,
+    error,
+  } = await supabase
     .from("profiles")
     .update({
       first_name: firstName,
       last_name: lastName,
     })
-    .eq("id", userId);
+    .eq("id", userId)
+    .select("id")
+    .maybeSingle();
 
   if (error) {
     console.error(
@@ -58,8 +55,17 @@ export async function updateProfile(
     );
   }
 
+  if (!updatedProfile) {
+    throw new Error(
+      "Profile not found or could not be updated."
+    );
+  }
+
   revalidatePath("/profile");
   revalidatePath("/dashboard");
+  revalidatePath("/learn");
+  revalidatePath("/resources");
+  revalidatePath("/sessions");
 
   redirect("/profile");
 }

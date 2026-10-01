@@ -1,42 +1,39 @@
-import Link from "next/link";
-import { redirect } from "next/navigation";
+import {
+  Mail,
+  Save,
+  ShieldCheck,
+  UserRound,
+} from "lucide-react";
 
-import PortalHeader from "../portal-header";
-import { createClient } from "@/lib/supabase/server";
+import LearnerPortalShell from "../learner-portal-shell";
+import styles from "../learner-portal.module.css";
+
+import { requireUser } from "@/lib/auth/require-user";
 import { getProfile } from "@/lib/data/profile";
 import { updateProfile } from "./actions";
 
 export default async function ProfilePage() {
-  const supabase = await createClient();
+  const { supabase, userId } =
+    await requireUser();
 
-  const { data: claimsData, error: claimsError } =
-    await supabase.auth.getClaims();
-
-  const userId = claimsData?.claims?.sub;
-
-  if (claimsError || !userId) {
-    redirect("/login");
-  }
-
-  const {
-    data: userData,
-    error: userError,
-  } = await supabase.auth.getUser();
+  const [
+    { data: userData, error: userError },
+    { data: profile, error: profileError },
+  ] = await Promise.all([
+    supabase.auth.getUser(),
+    getProfile(supabase, userId),
+  ]);
 
   if (userError || !userData.user) {
-    redirect("/login");
+    throw new Error(
+      "Unable to load account information."
+    );
   }
 
-  const { data: profile, error } =
-    await getProfile(
-      supabase,
-      userId
-    );
-
-  if (error || !profile) {
+  if (profileError || !profile) {
     console.error(
       "Unable to load profile:",
-      error
+      profileError
     );
 
     throw new Error(
@@ -52,68 +49,137 @@ export default async function ProfilePage() {
       ? "Administrator"
       : "Learner";
 
+  const fullName = [
+    profile.first_name,
+    profile.last_name,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const initials = [
+    profile.first_name,
+    profile.last_name,
+  ]
+    .filter(Boolean)
+    .map((name) =>
+      name.trim().charAt(0).toUpperCase()
+    )
+    .join("")
+    .slice(0, 2);
+
   return (
-    <div className="authPage">
-      <PortalHeader />
+    <LearnerPortalShell
+      firstName={
+        profile.first_name || "Learner"
+      }
+      role={profile.role}
+    >
+      <section className={styles.welcomeBlock}>
+        <span className={styles.courseMeta}>
+          NOVA LEARNING
+        </span>
 
-      <main className="dashboardShell">
-        <aside className="dashboardSidebar">
-          <h3>Learner Portal</h3>
+        <h1>Profile</h1>
 
-          <nav>
-            <Link href="/dashboard">
-              Overview
-            </Link>
+        <p>
+          Manage your personal information and
+          review your NOVA Learning account
+          details.
+        </p>
+      </section>
 
-            <Link href="/learn">
-              My Learning
-            </Link>
-
-            <Link href="/resources">
-              Resources
-            </Link>
-
-            <Link href="/sessions">
-              Sessions
-            </Link>
-
-            <Link href="/profile">
-              Profile
-            </Link>
-          </nav>
-        </aside>
-
-        <section className="dashboardMain">
-          <div className="dashboardHeading">
-            <div>
-              <p className="eyebrow">
-                NOVA LEARNING
-              </p>
-
-              <h1>Profile</h1>
-
-              <p>
-                Review and update your NOVA
-                learner information.
-              </p>
-            </div>
+      <section className={styles.profileLayout}>
+        <aside
+          className={styles.profileSummaryCard}
+        >
+          <div
+            className={styles.profileAvatarLarge}
+            aria-hidden="true"
+          >
+            {initials || "NL"}
           </div>
 
-          <section className="learningPanel">
-            <p className="eyebrow">
+          <div
+            className={styles.profileSummaryCopy}
+          >
+            <span className={styles.courseMeta}>
+              NOVA LEARNER
+            </span>
+
+            <h2>{fullName || "Learner"}</h2>
+
+            <p>{email}</p>
+          </div>
+
+          <div
+            className={styles.profileAccountMeta}
+          >
+            <div>
+              <UserRound
+                size={19}
+                aria-hidden="true"
+              />
+
+              <span>
+                <small>Account</small>
+                <strong>{roleLabel}</strong>
+              </span>
+            </div>
+
+            <div>
+              <Mail
+                size={19}
+                aria-hidden="true"
+              />
+
+              <span>
+                <small>Email</small>
+                <strong>Verified account</strong>
+              </span>
+            </div>
+
+            <div>
+              <ShieldCheck
+                size={19}
+                aria-hidden="true"
+              />
+
+              <span>
+                <small>Access</small>
+                <strong>NOVA Learning</strong>
+              </span>
+            </div>
+          </div>
+        </aside>
+
+        <section
+          className={styles.profileFormCard}
+        >
+          <div
+            className={styles.profileFormHeader}
+          >
+            <span className={styles.courseMeta}>
               PERSONAL INFORMATION
+            </span>
+
+            <h2>Profile Details</h2>
+
+            <p>
+              Keep your name and account
+              information up to date.
             </p>
+          </div>
 
-            <h2>
-              {profile.first_name}{" "}
-              {profile.last_name}
-            </h2>
-
-            <form
-              action={updateProfile}
-              className="formGrid"
+          <form
+            action={updateProfile}
+            className={styles.profileForm}
+          >
+            <div
+              className={styles.profileFormGrid}
             >
-              <div className="field">
+              <div
+                className={styles.profileField}
+              >
                 <label htmlFor="first_name">
                   First Name
                 </label>
@@ -125,11 +191,14 @@ export default async function ProfilePage() {
                   defaultValue={
                     profile.first_name
                   }
+                  autoComplete="given-name"
                   required
                 />
               </div>
 
-              <div className="field">
+              <div
+                className={styles.profileField}
+              >
                 <label htmlFor="last_name">
                   Last Name
                 </label>
@@ -141,11 +210,14 @@ export default async function ProfilePage() {
                   defaultValue={
                     profile.last_name
                   }
+                  autoComplete="family-name"
                   required
                 />
               </div>
 
-              <div className="field">
+              <div
+                className={styles.profileField}
+              >
                 <label htmlFor="email">
                   Email Address
                 </label>
@@ -155,6 +227,9 @@ export default async function ProfilePage() {
                   type="email"
                   value={email}
                   readOnly
+                  className={
+                    styles.readOnlyInput
+                  }
                 />
 
                 <small>
@@ -163,7 +238,9 @@ export default async function ProfilePage() {
                 </small>
               </div>
 
-              <div className="field">
+              <div
+                className={styles.profileField}
+              >
                 <label htmlFor="role">
                   Account Role
                 </label>
@@ -173,21 +250,36 @@ export default async function ProfilePage() {
                   type="text"
                   value={roleLabel}
                   readOnly
+                  className={
+                    styles.readOnlyInput
+                  }
                 />
-              </div>
 
-              <div>
-                <button
-                  type="submit"
-                  className="button"
-                >
-                  Save Changes
-                </button>
+                <small>
+                  Account roles are managed by
+                  NOVA.
+                </small>
               </div>
-            </form>
-          </section>
+            </div>
+
+            <div
+              className={styles.profileActions}
+            >
+              <button
+                type="submit"
+                className={styles.primaryButton}
+              >
+                <Save
+                  size={17}
+                  aria-hidden="true"
+                />
+
+                Save Changes
+              </button>
+            </div>
+          </form>
         </section>
-      </main>
-    </div>
+      </section>
+    </LearnerPortalShell>
   );
 }
