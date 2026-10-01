@@ -757,3 +757,21 @@
   width: 42px;
   height: 42px;
 }
+.sessionDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  margin-top: 16px;
+  color: #526b62;
+  font-size: 0.94rem;
+}
+
+.sessionDetails span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sessionDetails svg {
+  flex: 0 0 auto;
+}
