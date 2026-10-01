@@ -1,11 +1,5 @@
-import Link from "next/link";
-import {
-  BookOpen,
-  CheckCircle2,
-  User,
-} from "lucide-react";
+import DashboardClient from "./dashboard-client";
 
-import PortalHeader from "../portal-header";
 import { requireUser } from "@/lib/auth/require-user";
 import { getProfileSummary } from "@/lib/data/profiles";
 import { getUserEnrollmentsWithCurriculum } from "@/lib/data/enrollments";
@@ -13,375 +7,199 @@ import { getCompletedLessonIds } from "@/lib/data/progress";
 import { getUserCertificates } from "@/lib/data/certificates";
 
 export default async function Dashboard() {
-  const { supabase, userId } = await requireUser();
+  const { supabase, userId } =
+    await requireUser();
 
-  // Load learner profile.
+  /*
+   * Load the authenticated learner profile.
+   */
   const { data: profile } =
-    await getProfileSummary(supabase, userId);
+    await getProfileSummary(
+      supabase,
+      userId
+    );
 
-  const firstName = profile?.first_name || "Learner";
+  const firstName =
+    profile?.first_name || "Learner";
 
-  // Load enrollments together with course modules and lessons.
+  /*
+   * Load learner enrollments together with
+   * their course curriculum.
+   */
   const { data: enrollments } =
     await getUserEnrollmentsWithCurriculum(
       supabase,
       userId
     );
 
- const learningEnrollments =
-  enrollments?.filter(
-    (enrollment) =>
-      enrollment.status === "active" ||
-      enrollment.status === "completed"
-  ) ?? [];
+  const learningEnrollments =
+    enrollments?.filter(
+      (enrollment) =>
+        enrollment.status === "active" ||
+        enrollment.status === "completed"
+    ) ?? [];
 
-  // Load this learner's completed lessons.
+  /*
+   * Load completed lesson progress.
+   */
   const { data: lessonProgress } =
-    await getCompletedLessonIds(supabase, userId);
+    await getCompletedLessonIds(
+      supabase,
+      userId
+    );
 
   const completedLessonIds = new Set(
-    lessonProgress?.map((item) => item.lesson_id) ?? []
+    lessonProgress?.map(
+      (item) => item.lesson_id
+    ) ?? []
   );
-// Load certificates issued to this learner.
-// RLS ensures the authenticated learner can only
-// read certificate records belonging to them.
-const {
-  data: certificates,
-  error: certificatesError,
-} = await getUserCertificates(supabase, userId);
 
-if (certificatesError) {
-  throw new Error(certificatesError.message);
-}
+  /*
+   * Load certificates issued to this learner.
+   * RLS restricts certificate visibility to
+   * the authenticated learner.
+   */
+  const {
+    data: certificates,
+    error: certificatesError,
+  } = await getUserCertificates(
+    supabase,
+    userId
+  );
 
-const certificateByEnrollment = new Map(
-  (certificates ?? []).map((certificate) => [
-    certificate.enrollment_id,
-    certificate,
-  ])
-);
+  if (certificatesError) {
+    throw new Error(
+      certificatesError.message
+    );
+  }
 
-  // Calculate course progress.
- const coursesWithProgress = learningEnrollments
-  .map((enrollment) => {
-    const course = Array.isArray(enrollment.courses)
-      ? enrollment.courses[0]
-      : enrollment.courses;
+  const certificateByEnrollment =
+    new Map(
+      (certificates ?? []).map(
+        (certificate) => [
+          certificate.enrollment_id,
+          certificate,
+        ]
+      )
+    );
 
-    if (!course) {
-      return null;
-    }
+  /*
+   * Convert the database curriculum into the
+   * small serializable data model required by
+   * the interactive dashboard.
+   */
+  const courses = learningEnrollments
+    .map((enrollment) => {
+      const course = Array.isArray(
+        enrollment.courses
+      )
+        ? enrollment.courses[0]
+        : enrollment.courses;
 
-    const lessons =
-      course.modules?.flatMap(
-        (module) =>
-          module.lessons?.filter(
-            (lesson: {
-              id: string;
-              position: number;
-              published: boolean;
-            }) => lesson.published
-          ) ?? []
-      ) ?? [];
+      if (!course) {
+        return null;
+      }
 
-    const totalLessons = lessons.length;
+      const lessons =
+        course.modules?.flatMap(
+          (module) =>
+            module.lessons?.filter(
+              (lesson: {
+                id: string;
+                position: number;
+                published: boolean;
+              }) => lesson.published
+            ) ?? []
+        ) ?? [];
 
-    const completedLessons = lessons.filter(
-      (lesson) =>
-        completedLessonIds.has(lesson.id)
-    ).length;
+      const totalLessons =
+        lessons.length;
 
-    const progress =
-      totalLessons === 0
-        ? 0
-        : Math.round(
-            (completedLessons / totalLessons) * 100
-          );
+      const completedLessons =
+        lessons.filter((lesson) =>
+          completedLessonIds.has(
+            lesson.id
+          )
+        ).length;
 
-           return {
-      enrollmentId: enrollment.id,
-      enrollmentStatus: enrollment.status,
-      completedAt: enrollment.completed_at,
-      course,
-      totalLessons,
-      completedLessons,
-      progress,
-      certificate:
+      const progress =
+        totalLessons === 0
+          ? 0
+          : Math.round(
+              (completedLessons /
+                totalLessons) *
+                100
+            );
+
+      const completionDate =
+        enrollment.status ===
+          "completed" &&
+        enrollment.completed_at
+          ? new Intl.DateTimeFormat(
+              "en-CA",
+              {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }
+            ).format(
+              new Date(
+                enrollment.completed_at
+              )
+            )
+          : null;
+
+      const certificate =
         certificateByEnrollment.get(
           enrollment.id
-        ) ?? null,
-    };
-  })
-  .filter(
-    (
-      item
-    ): item is NonNullable<typeof item> =>
-      item !== null
-  );
+        );
+
+      return {
+        enrollmentId: enrollment.id,
+        enrollmentStatus:
+          enrollment.status,
+        title: course.title,
+        slug: course.slug,
+        summary:
+          course.summary ?? null,
+        completedLessons,
+        totalLessons,
+        progress,
+        completionDate,
+        certificateId:
+          certificate?.id ?? null,
+      };
+    })
+    .filter(
+      (
+        course
+      ): course is NonNullable<
+        typeof course
+      > => course !== null
+    );
+
+  const activeCount =
+    learningEnrollments.filter(
+      (enrollment) =>
+        enrollment.status === "active"
+    ).length;
 
   const completedCourses =
-    coursesWithProgress.filter(
-      (item) =>
-        item.enrollmentStatus === "completed"
+    learningEnrollments.filter(
+      (enrollment) =>
+        enrollment.status ===
+        "completed"
     ).length;
 
   return (
-    <div className="authPage">
-      <PortalHeader />
-
-      <main className="dashboardShell">
-        <aside className="dashboardSidebar">
-          <h3>Learner Portal</h3>
-
-          <nav>
-            <Link href="/dashboard">
-              Overview
-            </Link>
-
-       <Link href="/learn">
-  My Learning
-</Link>
-
-<Link href="/resources">
-  Resources
-</Link>
-
-<Link href="/sessions">
-  Sessions
-</Link>
-<Link href="/profile">
-  Profile
-</Link>
-          </nav>
-        </aside>
-
-        <section className="dashboardMain">
-          <div className="dashboardHeading">
-            <div>
-              <p className="eyebrow">
-                NOVA LEARNING
-              </p>
-
-              <h1>
-                Welcome, {firstName}
-              </h1>
-
-              <p>
-                Your learning, resources and program
-                activity in one place.
-              </p>
-            </div>
-          </div>
-
-          <div className="dashboardStats">
-            <div className="statCard">
-              <BookOpen size={24} />
-
-              <strong>
-  {enrollments?.filter(
-    (enrollment) => enrollment.status === "active"
-  ).length ?? 0}
-</strong>
-
-              <span>
-                Active learning pathways
-              </span>
-            </div>
-
-            <div className="statCard">
-              <CheckCircle2 size={24} />
-
-              <strong>
-                {completedCourses}
-              </strong>
-
-              <span>
-                Completed courses
-              </span>
-            </div>
-
-            <div className="statCard">
-              <User size={24} />
-
-              <strong>
-                {profile?.role === "admin"
-                  ? "Admin"
-                  : "Learner"}
-              </strong>
-
-              <span>
-                Account role
-              </span>
-            </div>
-          </div>
-
-          <section className="learningPanel">
-            <h2>My Learning</h2>
-
-            {coursesWithProgress.length === 0 ? (
-              <div className="emptyLearning">
-                <h3>
-                  No active courses yet
-                </h3>
-
-                <p>
-                  When you enroll in a NOVA
-                  learning program, it will
-                  appear here.
-                </p>
-
-                <Link
-                  href="/learn"
-                  className="button"
-                >
-                  Explore Learning
-                </Link>
-              </div>
-            ) : (
-              <div className="courseGrid">
-                {coursesWithProgress.map(
-                  (item) => {
-                    if (!item) return null;
-
-                  const {
-  enrollmentId,
-  enrollmentStatus,
-  completedAt,
-  course,
-  completedLessons,
-  totalLessons,
-  progress,
-  certificate,
-} = item;
-
-const completionDate =
-  enrollmentStatus === "completed" &&
-  completedAt
-    ? new Intl.DateTimeFormat("en-CA", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }).format(new Date(completedAt))
-    : null;
-
-                    return (
-                      <article
-                        className="courseCard"
-                        key={enrollmentId}
-                      >
-                        <div className="courseBody">
-                          <span className="courseMeta">
-                            NOVA Learning
-                          </span>
-
-                          <h3>
-                            {course.title}
-                          </h3>
-
-                          <p>
-                            {course.summary}
-                          </p>
-
-                          <div
-                            style={{
-                              marginTop: "20px",
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: "flex",
-                                justifyContent:
-                                  "space-between",
-                                gap: "16px",
-                                marginBottom: "8px",
-                              }}
-                            >
-                              <span>
-                                {completedLessons} of{" "}
-                                {totalLessons} lessons
-                                completed
-                              </span>
-
-                              <strong>
-                                {progress}%
-                              </strong>
-                            </div>
-
-                            <div
-                              style={{
-                                width: "100%",
-                                height: "10px",
-                                background:
-                                  "#e8ece9",
-                                borderRadius: "999px",
-                                overflow: "hidden",
-                              }}
-                            >
-                              <div
-                                style={{
-                                  width: `${progress}%`,
-                                  height: "100%",
-                                  background:
-                                    "#1c9654",
-                                  borderRadius:
-                                    "999px",
-                                  transition:
-                                    "width 0.3s ease",
-                                }}
-                              />
-                            </div>
-                          </div>
-
-                          {completionDate && (
-                            <p
-                              style={{
-                                marginTop: "12px",
-                                marginBottom: 0,
-                              }}
-                            >
-                              <strong>Completed:</strong>{" "}
-                              {completionDate}
-                            </p>
-                          )}
-
-                        <div
-  style={{
-    marginTop: "24px",
-    display: "flex",
-    gap: "10px",
-    flexWrap: "wrap",
-  }}
->
-  <Link
-    href={`/learn/${course.slug}`}
-    className="button"
-  >
-    {enrollmentStatus === "completed"
-  ? "Review Course"
-  : progress > 0
-    ? "Continue Learning"
-    : "Start Learning"}
-  </Link>
-
-  {certificate && (
-    <Link
-      href={`/certificates/${certificate.id}`}
-      className="button compact"
-    >
-      View Certificate
-    </Link>
-  )}
-</div>
-                        </div>
-                      </article>
-                    );
-                  }
-                )}
-              </div>
-            )}
-          </section>
-        </section>
-      </main>
-    </div>
+    <DashboardClient
+      firstName={firstName}
+      role={profile?.role ?? null}
+      activeCount={activeCount}
+      completedCourses={
+        completedCourses
+      }
+      courses={courses}
+    />
   );
 }

@@ -1,0 +1,749 @@
+.dashboardPage {
+  min-height: 100vh;
+  background: #f7f9f8;
+  color: #17342c;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: 260px minmax(260px, 560px) 1fr;
+  align-items: center;
+  gap: 32px;
+  min-height: 82px;
+  padding: 12px 32px;
+  background: rgba(255, 255, 255, 0.97);
+  border-bottom: 1px solid #e3e9e6;
+  backdrop-filter: blur(12px);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+}
+
+.brand img {
+  width: auto;
+  height: 64px;
+  object-fit: contain;
+  transform: scale(1.12);
+  transform-origin: left center;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 46px;
+  padding: 0 16px;
+  color: #6a7c76;
+  background: #f5f7f6;
+  border: 1px solid #dfe6e3;
+  border-radius: 12px;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.searchBox:focus-within {
+  background: #ffffff;
+  border-color: #1c9654;
+  box-shadow: 0 0 0 3px rgba(28, 150, 84, 0.12);
+}
+
+.searchBox input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #17342c;
+  font: inherit;
+}
+
+.searchBox input::placeholder {
+  color: #84938e;
+}
+
+.accountArea {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  color: #405b52;
+  background: transparent;
+  border-radius: 10px;
+}
+
+.iconButton:hover {
+  background: #f1f5f3;
+  color: #1c9654;
+}
+
+.accountDivider {
+  width: 1px;
+  height: 32px;
+  background: #e0e7e4;
+}
+
+.profileLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 50%;
+  background: #e5f5eb;
+  color: #147342;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.profileCopy {
+  display: grid;
+  gap: 1px;
+}
+
+.profileCopy strong {
+  color: #183b31;
+  font-size: 0.92rem;
+}
+
+.profileCopy small {
+  color: #71827c;
+  font-size: 0.78rem;
+}
+
+.logoutWrap :global(.button) {
+  min-height: 40px;
+  padding: 8px 14px;
+  font-size: 0.82rem;
+}
+
+.dashboardLayout {
+  display: grid;
+  grid-template-columns: 245px minmax(0, 1fr);
+  min-height: calc(100vh - 82px);
+}
+
+.sidebar {
+  position: sticky;
+  top: 82px;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 82px);
+  padding: 28px 18px 24px;
+  background: #ffffff;
+  border-right: 1px solid #e3e9e6;
+}
+
+.sidebarNav {
+  display: grid;
+  gap: 6px;
+}
+
+.navItem,
+.activeNavItem {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-height: 48px;
+  padding: 0 15px;
+  border-radius: 10px;
+  font-size: 0.94rem;
+  font-weight: 650;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.navItem {
+  color: #526861;
+}
+
+.navItem:hover {
+  color: #176f42;
+  background: #f2f8f4;
+  transform: translateX(2px);
+}
+
+.activeNavItem {
+  position: relative;
+  color: #126f40;
+  background: #eaf7ef;
+}
+
+.activeNavItem::before {
+  position: absolute;
+  left: 0;
+  width: 4px;
+  height: 26px;
+  content: "";
+  background: #1c9654;
+  border-radius: 0 6px 6px 0;
+}
+
+.sidebarHelp {
+  margin-top: auto;
+  padding: 18px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(28, 150, 84, 0.1),
+      rgba(31, 91, 145, 0.07)
+    );
+  border: 1px solid #dfeae4;
+  border-radius: 14px;
+}
+
+.sidebarHelp strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #176f42;
+  font-size: 0.9rem;
+}
+
+.sidebarHelp p {
+  margin: 0;
+  color: #64766f;
+  font-size: 0.79rem;
+  line-height: 1.55;
+}
+
+.main {
+  width: min(100%, 1440px);
+  padding: 42px clamp(24px, 4vw, 64px) 72px;
+}
+
+.welcomeBlock {
+  margin-bottom: 30px;
+}
+
+.welcomeBlock h1 {
+  margin: 0;
+  color: #173b31;
+  font-size: clamp(2rem, 3vw, 2.8rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.welcomeBlock p {
+  max-width: 680px;
+  margin: 10px 0 0;
+  color: #657871;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 44px;
+}
+
+.statCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  min-height: 154px;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #e1e8e5;
+  border-radius: 16px;
+  box-shadow: 0 6px 22px rgba(26, 62, 51, 0.045);
+}
+
+.statIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  border-radius: 12px;
+}
+
+.statIconBlue {
+  color: #275f91;
+  background: #edf5fb;
+}
+
+.statIconGreen {
+  color: #157944;
+  background: #e9f7ee;
+}
+
+.statIconNeutral {
+  color: #785e27;
+  background: #faf4e5;
+}
+
+.statCard strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #173b31;
+  font-size: 1.65rem;
+  line-height: 1;
+}
+
+.statCard h2 {
+  margin: 0 0 5px;
+  color: #29483f;
+  font-size: 0.94rem;
+  font-weight: 750;
+}
+
+.statCard p {
+  margin: 0;
+  color: #74847f;
+  font-size: 0.79rem;
+  line-height: 1.45;
+}
+
+.statCard .roleValue {
+  padding-top: 3px;
+  font-size: 1.15rem;
+}
+
+.learningSection {
+  min-width: 0;
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 18px;
+}
+
+.sectionHeading h2 {
+  margin: 0;
+  color: #173b31;
+  font-size: 1.55rem;
+  letter-spacing: -0.02em;
+}
+
+.sectionHeading p {
+  margin: 6px 0 0;
+  color: #70817b;
+  font-size: 0.9rem;
+}
+
+.viewAllLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  color: #167844;
+  font-size: 0.88rem;
+  font-weight: 750;
+}
+
+.viewAllLink:hover {
+  text-decoration: underline;
+}
+
+.courseList {
+  display: grid;
+  gap: 16px;
+}
+
+.courseRow {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 210px;
+  gap: 26px;
+  align-items: stretch;
+  overflow: hidden;
+  padding: 18px;
+  background: #ffffff;
+  border: 1px solid #e1e8e5;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px rgba(26, 62, 51, 0.04);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.courseRow:hover {
+  border-color: #ccdcd4;
+  box-shadow: 0 10px 30px rgba(26, 62, 51, 0.07);
+  transform: translateY(-1px);
+}
+
+.courseVisual {
+  position: relative;
+  min-height: 164px;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at 78% 24%,
+      rgba(255, 255, 255, 0.38),
+      transparent 24%
+    ),
+    linear-gradient(135deg, #1d8750 0%, #276b78 100%);
+  border-radius: 12px;
+}
+
+.courseVisual::before,
+.courseVisual::after {
+  position: absolute;
+  content: "";
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 50%;
+}
+
+.courseVisual::before {
+  top: 28px;
+  right: -22px;
+  width: 120px;
+  height: 120px;
+}
+
+.courseVisual::after {
+  right: 38px;
+  bottom: -54px;
+  width: 145px;
+  height: 145px;
+}
+
+.courseVisualLabel {
+  position: absolute;
+  z-index: 2;
+  left: 18px;
+  bottom: 18px;
+  max-width: 150px;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.courseContent {
+  align-self: center;
+  min-width: 0;
+  padding: 4px 0;
+}
+
+.courseMeta {
+  display: inline-block;
+  margin-bottom: 7px;
+  color: #16804a;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+}
+
+.courseContent h3 {
+  margin: 0;
+  color: #173b31;
+  font-size: 1.16rem;
+  line-height: 1.35;
+}
+
+.courseContent > p {
+  display: -webkit-box;
+  max-width: 720px;
+  margin: 8px 0 0;
+  overflow: hidden;
+  color: #697b75;
+  font-size: 0.87rem;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.progressMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 20px;
+  color: #64766f;
+  font-size: 0.78rem;
+}
+
+.progressMeta strong {
+  color: #1b6643;
+}
+
+.progressTrack {
+  width: 100%;
+  height: 7px;
+  margin-top: 8px;
+  overflow: hidden;
+  background: #e7ece9;
+  border-radius: 999px;
+}
+
+.progressTrack span {
+  display: block;
+  height: 100%;
+  background: #1c9654;
+  border-radius: inherit;
+  transition: width 300ms ease;
+}
+
+.completionDate {
+  margin-top: 9px !important;
+  color: #397156 !important;
+  font-size: 0.76rem !important;
+}
+
+.courseActions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.primaryButton,
+.secondaryButton,
+.certificateButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 42px;
+  padding: 9px 14px;
+  border-radius: 9px;
+  white-space: nowrap;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 750;
+  text-align: center;
+  cursor: pointer;
+}
+
+.primaryButton {
+  color: #ffffff;
+  background: #187b47;
+  border: 1px solid #187b47;
+}
+
+.primaryButton:hover {
+  background: #116b3b;
+}
+
+.secondaryButton {
+  color: #176f42;
+  background: #ffffff;
+  border: 1px solid #bdd4c7;
+}
+
+.secondaryButton:hover {
+  background: #f2f8f4;
+}
+
+.certificateButton {
+  color: #405d53;
+  background: #f7f9f8;
+  border: 1px solid #dce5e1;
+}
+
+.certificateButton:hover {
+  color: #176f42;
+  border-color: #bdd4c7;
+}
+
+.completedStatus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #177844;
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.emptyState {
+  display: grid;
+  justify-items: center;
+  padding: 58px 28px;
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid #e1e8e5;
+  border-radius: 16px;
+}
+
+.emptyState > svg {
+  margin-bottom: 12px;
+  color: #1c9654;
+}
+
+.emptyState h3 {
+  margin: 0;
+  color: #173b31;
+}
+
+.emptyState p {
+  max-width: 480px;
+  margin: 8px 0 20px;
+  color: #6d7e78;
+  line-height: 1.6;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 1100px) {
+  .topbar {
+    grid-template-columns: 210px minmax(220px, 1fr) auto;
+    gap: 18px;
+    padding-inline: 22px;
+  }
+
+  .profileCopy,
+  .accountDivider {
+    display: none;
+  }
+
+  .dashboardLayout {
+    grid-template-columns: 210px minmax(0, 1fr);
+  }
+
+  .courseRow {
+    grid-template-columns: 180px minmax(0, 1fr);
+  }
+
+  .courseActions {
+    grid-column: 2;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 820px) {
+  .topbar {
+    position: relative;
+    grid-template-columns: 1fr auto;
+    min-height: auto;
+  }
+
+  .brand img {
+    height: 48px;
+  }
+
+  .searchBox {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .dashboardLayout {
+    display: block;
+  }
+
+  .sidebar {
+    position: static;
+    min-height: 0;
+    padding: 10px 16px;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid #e3e9e6;
+  }
+
+  .sidebarNav {
+    display: flex;
+    width: max-content;
+  }
+
+  .navItem,
+  .activeNavItem {
+    min-height: 42px;
+    white-space: nowrap;
+  }
+
+  .activeNavItem::before,
+  .sidebarHelp {
+    display: none;
+  }
+
+  .main {
+    padding: 30px 20px 56px;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .statCard {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 680px) {
+  .topbar {
+    padding: 12px 16px;
+  }
+
+  .iconButton {
+    display: none;
+  }
+
+  .logoutWrap :global(.button) {
+    padding-inline: 11px;
+  }
+
+  .sectionHeading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .courseRow {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 14px;
+  }
+
+  .courseVisual {
+    min-height: 145px;
+  }
+
+  .courseActions {
+    grid-column: 1;
+    flex-direction: column;
+  }
+
+  .primaryButton,
+  .secondaryButton,
+  .certificateButton {
+    width: 100%;
+  }
+}
