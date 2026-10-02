@@ -191,30 +191,38 @@ export default async function CoursePage({
                     ? "Continue Learning"
                     : "Start Learning"}
                 </Link>
-              ) : courseCompleted ? (
-                <Link
-                  href={`/learn/${course.slug}/completion`}
-                  className={styles.primaryButton}
-                >
-                  <Award
-                    size={17}
-                    aria-hidden="true"
-                  />
-                  View Completion
-                </Link>
-              ) : (
-                <span
-                  className={
-                    styles.enrollmentNotice
-                  }
-                >
-                  <LockKeyhole
-                    size={16}
-                    aria-hidden="true"
-                  />
-                  Enrollment required to begin
-                </span>
-              )}
+             ) : courseCompleted ? (
+  <Link
+    href={`/learn/${course.slug}/completion`}
+    className={styles.primaryButton}
+  >
+    <Award
+      size={17}
+      aria-hidden="true"
+    />
+    View Completion
+  </Link>
+) : !isEnrolled ? (
+  <span
+    className={styles.enrollmentNotice}
+  >
+    <LockKeyhole
+      size={16}
+      aria-hidden="true"
+    />
+    Enrollment required to begin
+  </span>
+) : (
+  <span
+    className={styles.enrollmentNotice}
+  >
+    <BookOpen
+      size={16}
+      aria-hidden="true"
+    />
+    No published lessons available yet
+  </span>
+)}
 
               <Link
                 href="/dashboard"
