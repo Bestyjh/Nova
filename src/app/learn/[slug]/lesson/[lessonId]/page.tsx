@@ -3,11 +3,18 @@ import { notFound, redirect } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
+  BookOpen,
   CheckCircle2,
+  ChevronRight,
+  ClipboardCheck,
 } from "lucide-react";
 
-import PortalHeader from "../../../../portal-header";
+import LearnerPortalShell from "../../../../learner-portal-shell";
+import styles from "../../../../learner-portal.module.css";
+
 import { createClient } from "@/lib/supabase/server";
+import { getProfileSummary } from "@/lib/data/profiles";
+
 import CompleteLessonButton from "./complete-lesson-button";
 import LessonContent from "../../../lesson-content";
 
@@ -49,7 +56,19 @@ export default async function LessonPage({
   if (claimsError || !userId) {
     redirect("/login");
   }
+const {
+  data: profile,
+  error: profileError,
+} = await getProfileSummary(
+  supabase,
+  userId
+);
 
+if (profileError) {
+  throw new Error(
+    "Unable to load learner profile."
+  );
+}
   // Load course and its complete lesson structure.
   const { data: course, error: courseError } =
     await supabase
@@ -218,7 +237,17 @@ if (!previousLessonsCompleted) {
    const moduleData = Array.isArray(lesson.modules)
     ? lesson.modules[0]
     : lesson.modules;
+const currentModuleIndex =
+  (course.modules ?? [])
+    .sort((a, b) => a.position - b.position)
+    .findIndex(
+      (module) => module.id === moduleData?.id
+    );
 
+const moduleNumber =
+  currentModuleIndex >= 0
+    ? currentModuleIndex + 1
+    : null;
   // Load the published assessment attached to this lesson.
   const {
     data: assessment,
@@ -330,391 +359,554 @@ if (!previousLessonsCompleted) {
       : null;
 
   return (
-    <div className="learnPage">
-      <PortalHeader />
+    <LearnerPortalShell
+      firstName={
+        profile?.first_name || "Learner"
+      }
+      role={profile?.role ?? null}
+    >
+      <section className={styles.lessonWorkspace}>
+        <div className={styles.courseBreadcrumb}>
+          <Link href="/learn">
+            My Learning
+          </Link>
 
-      <section className="catalogHero">
-        <div className="wrap">
-          <div>
-            <span
-              className="courseMeta"
-              style={{ color: "#bce5c3" }}
-            >
-              {course.title}
+          <ChevronRight
+            size={15}
+            aria-hidden="true"
+          />
+
+          <Link href={`/learn/${course.slug}`}>
+            {course.title}
+          </Link>
+
+          <ChevronRight
+            size={15}
+            aria-hidden="true"
+          />
+
+          <span>{lesson.title}</span>
+        </div>
+
+        <header className={styles.lessonHero}>
+          <div className={styles.lessonHeroCopy}>
+            <span className={styles.courseMeta}>
+              {moduleNumber
+                ? `MODULE ${moduleNumber}`
+                : "NOVA LEARNING"}
             </span>
 
             <h1>{lesson.title}</h1>
 
             <p>
-              {moduleData?.title ?? "NOVA Learning"}
+              {moduleData?.title ??
+                "NOVA Learning"}
             </p>
-          </div>
 
-          <div className="statCard">
-            <strong>{courseProgress}%</strong>
+            <div className={styles.lessonMetaRow}>
+              <span>
+                <BookOpen
+                  size={16}
+                  aria-hidden="true"
+                />
 
-            <span>
-              {completedLessons} of {totalLessons} lessons
-              completed
-            </span>
-          </div>
-        </div>
-      </section>
-
-      <section className="catalog">
-        <div className="wrap">
-          <div className="catalogTop">
-            <div>
-              <span className="courseMeta">
                 Lesson {currentIndex + 1} of{" "}
                 {totalLessons}
               </span>
 
-              <h2>{lesson.title}</h2>
+              <span>
+                {completed ? (
+                  <>
+                    <CheckCircle2
+                      size={16}
+                      aria-hidden="true"
+                    />
+                    Completed
+                  </>
+                ) : (
+                  <>
+                    <BookOpen
+                      size={16}
+                      aria-hidden="true"
+                    />
+                    In progress
+                  </>
+                )}
+              </span>
+
+              {assessment && (
+                <span>
+                  <ClipboardCheck
+                    size={16}
+                    aria-hidden="true"
+                  />
+                  Assessment required
+                </span>
+              )}
             </div>
+          </div>
+
+          <aside
+            className={styles.lessonProgressCard}
+          >
+            <div
+              className={styles.courseProgressTop}
+            >
+              <span>Course progress</span>
+              <strong>{courseProgress}%</strong>
+            </div>
+
+            <div
+              className={styles.courseProgressTrack}
+              aria-label={`${courseProgress}% course progress`}
+            >
+              <span
+                style={{
+                  width: `${courseProgress}%`,
+                }}
+              />
+            </div>
+
+            <p>
+              {completedLessons} of {totalLessons}{" "}
+              lessons completed
+            </p>
 
             <Link
               href={`/learn/${course.slug}`}
-              className="button compact"
+              className={styles.lessonCourseLink}
             >
-              Course Overview
+              Course overview
+              <ChevronRight
+                size={16}
+                aria-hidden="true"
+              />
             </Link>
-          </div>
+          </aside>
+        </header>
 
-          <article className="courseCard">
-            <div className="courseBody">
-              <span className="courseMeta">
-                {lesson.kind}
-              </span>
+        <div className={styles.lessonLayout}>
+          <main className={styles.lessonMainColumn}>
+            <article
+              className={styles.lessonContentCard}
+            >
+              <div
+                className={
+                  styles.lessonContentHeader
+                }
+              >
+                <div>
+                  <span className={styles.courseMeta}>
+                    {String(
+                      lesson.kind || "lesson"
+                    ).toUpperCase()}
+                  </span>
 
-              {completed && (
-                <p>
-                  <CheckCircle2
-                    size={18}
-                    style={{
-                      verticalAlign: "middle",
-                      marginRight: "8px",
-                    }}
-                  />
+                  <h2>Lesson Content</h2>
+                </div>
 
-                  <strong>
-                    Lesson completed
-                  </strong>
-                </p>
-              )}
+                {completed && (
+                  <span
+                    className={
+                      styles.lessonCompleteBadge
+                    }
+                  >
+                    <CheckCircle2
+                      size={16}
+                      aria-hidden="true"
+                    />
+                    Completed
+                  </span>
+                )}
+              </div>
 
-     <h3>Lesson Content</h3>
-
-<LessonContent content={lesson.content} />
-
-<CompleteLessonButton
-  lessonId={lesson.id}
-  courseSlug={course.slug}
-  completed={completed}
-  nextLessonId={nextLesson?.id ?? null}
-  canComplete={assessmentPassed}
-/>
-            </div>
-          </article>
+              <div
+                className={styles.lessonContentBody}
+              >
+                <LessonContent
+                  content={lesson.content}
+                />
+              </div>
+            </article>
 
             {assessment && (
               <section
-                className="learningPanel"
-                style={{ marginTop: "24px" }}
+                className={styles.assessmentPanel}
               >
-                <span className="courseMeta">
-                  ASSESSMENT
-                </span>
+                <div
+                  className={
+                    styles.assessmentHeading
+                  }
+                >
+                  <div
+                    className={
+                      styles.assessmentIcon
+                    }
+                  >
+                    <ClipboardCheck
+                      size={22}
+                      aria-hidden="true"
+                    />
+                  </div>
 
-                <h2>{assessment.title}</h2>
+                  <div>
+                    <span
+                      className={styles.courseMeta}
+                    >
+                      ASSESSMENT
+                    </span>
 
-                {assessment.description && (
-                  <p>{assessment.description}</p>
-                )}
+                    <h2>{assessment.title}</h2>
+
+                    {assessment.description && (
+                      <p>
+                        {assessment.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
 
                 <div
-                  style={{
-                    display: "flex",
-                    gap: "16px",
-                    flexWrap: "wrap",
-                    marginTop: "20px",
-                  }}
+                  className={styles.assessmentStats}
                 >
-                  <div className="statCard">
+                  <div>
                     <strong>
                       {assessment.passing_score}%
                     </strong>
-                    <span>Passing Score</span>
+                    <span>Passing score</span>
                   </div>
 
-                  <div className="statCard">
+                  <div>
                     <strong>
                       {assessmentAttemptCount}
                     </strong>
                     <span>
                       {assessmentAttemptCount === 1
-                        ? "Attempt"
-                        : "Attempts"}
+                        ? "Attempt made"
+                        : "Attempts made"}
                     </span>
                   </div>
 
-                  <div className="statCard">
+                  <div>
                     <strong>
-                      {assessmentAttemptsRemaining === null
-                        ? "Unlimited"
+                      {assessmentAttemptsRemaining ===
+                      null
+                        ? "∞"
                         : assessmentAttemptsRemaining}
                     </strong>
-                    <span>Attempts Remaining</span>
+                    <span>
+                      Attempts remaining
+                    </span>
                   </div>
                 </div>
 
                 {latestAssessmentAttempt && (
-                  <div style={{ marginTop: "20px" }}>
-                    <p>
-                      <strong>Latest Score:</strong>{" "}
-                      {latestAssessmentAttempt.score}%
-                    </p>
+                  <div
+                    className={
+                      latestAssessmentAttempt.passed
+                        ? styles.assessmentResultPassed
+                        : styles.assessmentResultPending
+                    }
+                  >
+                    <strong>
+                      Latest score:{" "}
+                      {
+                        latestAssessmentAttempt.score
+                      }
+                      %
+                    </strong>
 
-                    <p>
-                      <strong>Result:</strong>{" "}
+                    <span>
                       {latestAssessmentAttempt.passed
-                        ? "Passed"
-                        : "Not Passed"}
-                    </p>
+                        ? "Assessment passed"
+                        : "Passing score not yet reached"}
+                    </span>
                   </div>
                 )}
 
-                <div style={{ marginTop: "20px" }}>
-                {assessmentPassed ? (
-  <div>
-    <p>
-      <strong>✓ Assessment Passed</strong>
-    </p>
+                <div
+                  className={styles.assessmentBody}
+                >
+                  {assessmentPassed ? (
+                    <div
+                      className={
+                        styles.assessmentSuccess
+                      }
+                    >
+                      <CheckCircle2
+                        size={24}
+                        aria-hidden="true"
+                      />
 
-    <p>
-      You have successfully completed this
-      assessment.
-    </p>
-  </div>
-) : assessmentAttemptsRemaining === 0 ? (
-  <p>
-    You have used all available attempts for
-    this assessment.
-  </p>
-) : assessmentQuestions.length === 0 ? (
-  <p>
-    No assessment questions are currently
-    available.
-  </p>
-) : submitAssessmentAction ? (
-  <form action={submitAssessmentAction}>
-    <div
-      style={{
-        display: "grid",
-        gap: "24px",
-      }}
-    >
-      {assessmentQuestions.map(
-        (question, index) => {
-          const options = Array.isArray(
-            question.options
-          )
-            ? question.options.filter(
-                (
-                  option
-                ): option is string =>
-                  typeof option === "string"
-              )
-            : [];
+                      <div>
+                        <strong>
+                          Assessment Passed
+                        </strong>
 
-          return (
-            <fieldset
-              key={question.id}
-              style={{
-                border: "1px solid #e2e8e5",
-                borderRadius: "12px",
-                padding: "20px",
-              }}
-            >
-              <legend>
-                <strong>
-                  Question {index + 1}
-                </strong>
-              </legend>
+                        <p>
+                          You have successfully
+                          completed this assessment.
+                        </p>
+                      </div>
+                    </div>
+                  ) : assessmentAttemptsRemaining ===
+                    0 ? (
+                    <div
+                      className={
+                        styles.assessmentNotice
+                      }
+                    >
+                      <strong>
+                        No attempts remaining
+                      </strong>
 
-              <p>
-                {question.question_text}
-              </p>
+                      <p>
+                        You have used all available
+                        attempts for this assessment.
+                      </p>
+                    </div>
+                  ) : assessmentQuestions.length ===
+                    0 ? (
+                    <div
+                      className={
+                        styles.assessmentNotice
+                      }
+                    >
+                      <strong>
+                        Assessment unavailable
+                      </strong>
 
-              <div
-                style={{
-                  display: "grid",
-                  gap: "12px",
-                  marginTop: "16px",
-                }}
-              >
-                {options.map((option) => (
-                  <label
-                    key={option}
-                    style={{
-                      display: "flex",
-                      gap: "10px",
-                      alignItems: "flex-start",
-                    }}
-                  >
-                    <input
-                      type="radio"
-                      name={`question_${question.id}`}
-                      value={option}
-                      required
-                    />
+                      <p>
+                        No assessment questions are
+                        currently available.
+                      </p>
+                    </div>
+                  ) : submitAssessmentAction ? (
+                    <form
+                      action={
+                        submitAssessmentAction
+                      }
+                    >
+                      <div
+                        className={
+                          styles.assessmentQuestions
+                        }
+                      >
+                        {assessmentQuestions.map(
+                          (question, index) => {
+                            const options =
+                              Array.isArray(
+                                question.options
+                              )
+                                ? question.options.filter(
+                                    (
+                                      option
+                                    ): option is string =>
+                                      typeof option ===
+                                      "string"
+                                  )
+                                : [];
 
-                    <span>{option}</span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-          );
-        }
-      )}
+                            return (
+                              <fieldset
+                                key={question.id}
+                                className={
+                                  styles.assessmentQuestion
+                                }
+                              >
+                                <legend>
+                                  Question{" "}
+                                  {index + 1}
+                                </legend>
 
-      <button
-        type="submit"
-        className="button"
-      >
-        Submit Assessment
-      </button>
-    </div>
-  </form>
-) : null}
+                                <p>
+                                  {
+                                    question.question_text
+                                  }
+                                </p>
+
+                                <div
+                                  className={
+                                    styles.assessmentOptions
+                                  }
+                                >
+                                  {options.map(
+                                    (option) => (
+                                      <label
+                                        key={option}
+                                        className={
+                                          styles.assessmentOption
+                                        }
+                                      >
+                                        <input
+                                          type="radio"
+                                          name={`question_${question.id}`}
+                                          value={
+                                            option
+                                          }
+                                          required
+                                        />
+
+                                        <span>
+                                          {option}
+                                        </span>
+                                      </label>
+                                    )
+                                  )}
+                                </div>
+                              </fieldset>
+                            );
+                          }
+                        )}
+
+                        <button
+                          type="submit"
+                          className={
+                            styles.primaryButton
+                          }
+                        >
+                          <ClipboardCheck
+                            size={17}
+                            aria-hidden="true"
+                          />
+                          Submit Assessment
+                        </button>
+                      </div>
+                    </form>
+                  ) : null}
                 </div>
               </section>
             )}
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "stretch",
-              gap: "20px",
-              marginTop: "32px",
-              flexWrap: "wrap",
-            }}
-          >
-            <div style={{ flex: "1 1 280px" }}>
+            <section
+              className={styles.lessonCompletionPanel}
+            >
+              <div>
+                <span className={styles.courseMeta}>
+                  LESSON PROGRESS
+                </span>
+
+                <h2>
+                  {completed
+                    ? "Lesson completed"
+                    : assessment &&
+                        !assessmentPassed
+                      ? "Complete the assessment first"
+                      : "Ready to complete this lesson?"}
+                </h2>
+
+                <p>
+                  {completed
+                    ? "Your progress has been saved."
+                    : assessment &&
+                        !assessmentPassed
+                      ? "You must pass the assessment before this lesson can be marked complete."
+                      : "Mark this lesson complete when you are ready to continue."}
+                </p>
+              </div>
+
+              <CompleteLessonButton
+                lessonId={lesson.id}
+                courseSlug={course.slug}
+                completed={completed}
+                nextLessonId={
+                  nextLesson?.id ?? null
+                }
+                canComplete={
+                  assessmentPassed
+                }
+              />
+            </section>
+
+            <nav
+              className={styles.lessonNavigation}
+              aria-label="Lesson navigation"
+            >
               {previousLesson ? (
                 <Link
                   href={`/learn/${course.slug}/lesson/${previousLesson.id}`}
-                  className="courseCard"
-                  style={{
-                    display: "block",
-                    textDecoration: "none",
-                    height: "100%",
-                  }}
+                  className={
+                    styles.lessonNavigationCard
+                  }
                 >
-                  <div className="courseBody">
-                    <span className="courseMeta">
-                      <ArrowLeft
-                        size={16}
-                        style={{
-                          verticalAlign: "middle",
-                        }}
-                      />{" "}
-                      Previous Lesson
-                    </span>
+                  <ArrowLeft
+                    size={18}
+                    aria-hidden="true"
+                  />
 
-                    <h3>
+                  <span>
+                    <small>
+                      Previous lesson
+                    </small>
+                    <strong>
                       {previousLesson.title}
-                    </h3>
-                  </div>
+                    </strong>
+                  </span>
                 </Link>
               ) : (
                 <Link
                   href={`/learn/${course.slug}`}
-                  className="courseCard"
-                  style={{
-                    display: "block",
-                    textDecoration: "none",
-                    height: "100%",
-                  }}
+                  className={
+                    styles.lessonNavigationCard
+                  }
                 >
-                  <div className="courseBody">
-                    <span className="courseMeta">
-                      <ArrowLeft
-                        size={16}
-                        style={{
-                          verticalAlign: "middle",
-                        }}
-                      />{" "}
-                      Course Overview
-                    </span>
+                  <ArrowLeft
+                    size={18}
+                    aria-hidden="true"
+                  />
 
-                    <h3>
+                  <span>
+                    <small>
+                      Course overview
+                    </small>
+                    <strong>
                       Back to course
-                    </h3>
-                  </div>
+                    </strong>
+                  </span>
                 </Link>
               )}
-            </div>
 
-            <div style={{ flex: "1 1 280px" }}>
               {nextLesson ? (
                 <Link
                   href={`/learn/${course.slug}/lesson/${nextLesson.id}`}
-                  className="courseCard"
-                  style={{
-                    display: "block",
-                    textDecoration: "none",
-                    height: "100%",
-                  }}
+                  className={`${styles.lessonNavigationCard} ${styles.lessonNavigationNext}`}
                 >
-                  <div className="courseBody">
-                    <span className="courseMeta">
-                      Next Lesson{" "}
-                      <ArrowRight
-                        size={16}
-                        style={{
-                          verticalAlign: "middle",
-                        }}
-                      />
-                    </span>
-
-                    <h3>
+                  <span>
+                    <small>Next lesson</small>
+                    <strong>
                       {nextLesson.title}
-                    </h3>
-                  </div>
+                    </strong>
+                  </span>
+
+                  <ArrowRight
+                    size={18}
+                    aria-hidden="true"
+                  />
                 </Link>
               ) : (
                 <Link
                   href={`/learn/${course.slug}`}
-                  className="courseCard"
-                  style={{
-                    display: "block",
-                    textDecoration: "none",
-                    height: "100%",
-                  }}
+                  className={`${styles.lessonNavigationCard} ${styles.lessonNavigationNext}`}
                 >
-                  <div className="courseBody">
-                    <span className="courseMeta">
-                      Course Complete
-                    </span>
+                  <span>
+                    <small>
+                      Course overview
+                    </small>
+                    <strong>
+                      Return to course
+                    </strong>
+                  </span>
 
-                    <h3>
-                      Return to Course{" "}
-                      <ArrowRight
-                        size={18}
-                        style={{
-                          verticalAlign: "middle",
-                        }}
-                      />
-                    </h3>
-                  </div>
+                  <ArrowRight
+                    size={18}
+                    aria-hidden="true"
+                  />
                 </Link>
               )}
-            </div>
-          </div>
+            </nav>
+          </main>
         </div>
       </section>
-    </div>
+    </LearnerPortalShell>
   );
 }
