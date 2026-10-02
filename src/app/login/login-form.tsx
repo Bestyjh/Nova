@@ -114,6 +114,11 @@ export default function LoginForm() {
           required
         />
       </div>
+      <p className="authFine">
+  <Link href="/forgot-password">
+    Forgot your password?
+  </Link>
+</p>
 
       {error && (
         <p
