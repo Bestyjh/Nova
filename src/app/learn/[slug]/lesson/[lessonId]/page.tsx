@@ -818,11 +818,11 @@ const moduleNumber =
               />
             </section>
 
-            <nav
+                       <nav
               className={styles.lessonNavigation}
               aria-label="Lesson navigation"
             >
-              {previousLesson ? (
+              {previousLesson && (
                 <Link
                   href={`/learn/${course.slug}/lesson/${previousLesson.id}`}
                   className={
@@ -840,27 +840,6 @@ const moduleNumber =
                     </small>
                     <strong>
                       {previousLesson.title}
-                    </strong>
-                  </span>
-                </Link>
-              ) : (
-                <Link
-                  href={`/learn/${course.slug}`}
-                  className={
-                    styles.lessonNavigationCard
-                  }
-                >
-                  <ArrowLeft
-                    size={18}
-                    aria-hidden="true"
-                  />
-
-                  <span>
-                    <small>
-                      Course overview
-                    </small>
-                    <strong>
-                      Back to course
                     </strong>
                   </span>
                 </Link>
@@ -883,7 +862,7 @@ const moduleNumber =
                     aria-hidden="true"
                   />
                 </Link>
-              ) : (
+              ) : !completed ? (
                 <Link
                   href={`/learn/${course.slug}`}
                   className={`${styles.lessonNavigationCard} ${styles.lessonNavigationNext}`}
@@ -902,7 +881,7 @@ const moduleNumber =
                     aria-hidden="true"
                   />
                 </Link>
-              )}
+              ) : null}
             </nav>
           </main>
         </div>
