@@ -68,6 +68,12 @@ export default async function AdminCoursesPage() {
                 curriculum and publishing.
               </p>
             </div>
+            <Link
+  href="/admin/courses/new"
+  className="button"
+>
+  Add Course
+</Link>
           </div>
 
           {courseList.length === 0 ? (

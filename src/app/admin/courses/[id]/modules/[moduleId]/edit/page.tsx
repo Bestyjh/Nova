@@ -27,7 +27,15 @@ export default async function EditModulePage({
   const { data: moduleRecord, error: moduleError } =
     await supabase
       .from("modules")
-      .select("id, title, position, course_id")
+     .select(`
+  id,
+  title,
+  position,
+  course_id,
+  lessons (
+    id
+  )
+`)
       .eq("id", moduleId)
       .eq("course_id", id)
       .single();
@@ -35,7 +43,11 @@ export default async function EditModulePage({
   if (moduleError || !moduleRecord) {
     notFound();
   }
+const lessonCount =
+  moduleRecord.lessons?.length ?? 0;
 
+const canDelete =
+  lessonCount === 0;
   // Load course information separately.
   const { data: course, error: courseError } =
     await supabase
@@ -177,25 +189,56 @@ export default async function EditModulePage({
 >
   <h3>Delete Module</h3>
 
-  <p>
-    A module can only be deleted when it contains
-    no lessons.
-  </p>
+  {canDelete ? (
+    <>
+      <p>
+        This module contains no lessons and can
+        be safely deleted.
+      </p>
 
-  <form
-    action={deleteModule.bind(
-      null,
-      course.id,
-      moduleRecord.id
-    )}
-  >
-    <button
-      type="submit"
-      className="button"
+      <form
+        action={deleteModule.bind(
+          null,
+          course.id,
+          moduleRecord.id
+        )}
+      >
+        <button
+          type="submit"
+          className="button"
+        >
+          Delete Empty Module
+        </button>
+      </form>
+    </>
+  ) : (
+    <div
+      role="status"
+      style={{
+        marginTop: "16px",
+        padding: "16px",
+        border: "1px solid #ddd",
+        borderRadius: "12px",
+      }}
     >
-      Delete Empty Module
-    </button>
-  </form>
+      <strong>
+        This module cannot be deleted.
+      </strong>
+
+      <p
+        style={{
+          marginTop: "8px",
+          marginBottom: 0,
+        }}
+      >
+        It contains {lessonCount}{" "}
+        {lessonCount === 1 ? "lesson" : "lessons"}.
+        Delete or move the{" "}
+        {lessonCount === 1 ? "lesson" : "lessons"}{" "}
+        before deleting this module.
+      </p>
+    </div>
+  )}
 </div>
           </section>
         </section>
