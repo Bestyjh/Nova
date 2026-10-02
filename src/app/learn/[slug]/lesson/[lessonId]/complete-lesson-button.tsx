@@ -11,6 +11,7 @@ type Props = {
   completed: boolean;
   nextLessonId?: string | null;
   canComplete: boolean;
+  initialCourseCompleted: boolean;
 };
 
 export default function CompleteLessonButton({
@@ -19,6 +20,7 @@ export default function CompleteLessonButton({
   completed,
   nextLessonId,
   canComplete,
+  initialCourseCompleted,
 }: Props) {
   const router = useRouter();
 
@@ -26,7 +28,7 @@ export default function CompleteLessonButton({
     useState(completed);
 
   const [courseCompleted, setCourseCompleted] =
-    useState(false);
+    useState(initialCourseCompleted);
 
   const [loading, setLoading] =
     useState(false);

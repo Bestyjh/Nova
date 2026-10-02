@@ -809,6 +809,9 @@ const moduleNumber =
                 lessonId={lesson.id}
                 courseSlug={course.slug}
                 completed={completed}
+                initialCourseCompleted={
+                  enrollment.status === "completed"
+                }
                 nextLessonId={
                   nextLesson?.id ?? null
                 }
