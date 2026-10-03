@@ -83,5 +83,8 @@ export async function getLearnerSessions(
       )
     `)
     .eq("published", true)
+    .or(
+      `ends_at.gte.${new Date().toISOString()},and(ends_at.is.null,starts_at.gte.${new Date().toISOString()})`
+    )
     .order("starts_at", { ascending: true });
 }
