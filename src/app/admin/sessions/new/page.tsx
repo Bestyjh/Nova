@@ -8,6 +8,10 @@ import { createSession } from "../actions";
 export default async function NewSessionPage() {
   const { supabase } = await requireAdmin();
 
+  const timezones = Intl.supportedValuesOf(
+    "timeZone"
+  );
+
   const { data: courses } = await supabase
     .from("courses")
     .select("id, title")
@@ -128,6 +132,32 @@ export default async function NewSessionPage() {
                       </option>
                     )
                   )}
+                </select>
+              </div>
+
+              <div className="field">
+                <label htmlFor="timezone">
+                  Timezone
+                </label>
+
+                <select
+                  id="timezone"
+                  name="timezone"
+                  defaultValue=""
+                  required
+                >
+                  <option value="" disabled>
+                    Select timezone
+                  </option>
+
+                  {timezones.map((timezone) => (
+                    <option
+                      key={timezone}
+                      value={timezone}
+                    >
+                      {timezone}
+                    </option>
+                  ))}
                 </select>
               </div>
 

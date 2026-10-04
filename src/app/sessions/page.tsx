@@ -41,6 +41,7 @@ export default async function SessionsPage() {
         sessionType: session.session_type,
         startsAt: session.starts_at,
         endsAt: session.ends_at ?? null,
+        timezone: session.timezone,
         location: session.location ?? null,
         meetingUrl:
           session.meeting_url ?? null,

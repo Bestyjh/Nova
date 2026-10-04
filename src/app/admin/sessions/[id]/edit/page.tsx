@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { formatInTimeZone } from "date-fns-tz";
 
 import AdminSidebar from "../../../admin-sidebar";
 import PortalHeader from "../../../../portal-header";
@@ -19,28 +20,28 @@ type PageProps = {
 };
 
 function toDateTimeLocal(
-  value: string | null
+  value: string | null,
+  timezone: string
 ) {
   if (!value) {
     return "";
   }
 
-  const date = new Date(value);
-
-  const offset =
-    date.getTimezoneOffset() * 60000;
-
-  return new Date(
-    date.getTime() - offset
-  )
-    .toISOString()
-    .slice(0, 16);
+  return formatInTimeZone(
+    value,
+    timezone,
+    "yyyy-MM-dd'T'HH:mm"
+  );
 }
 
 export default async function EditSessionPage({
   params,
 }: PageProps) {
   const { id } = await params;
+
+  const timezones = Intl.supportedValuesOf(
+    "timeZone"
+  );
 
   const { supabase } = await requireAdmin();
 
@@ -192,6 +193,28 @@ export default async function EditSessionPage({
               </div>
 
               <div className="field">
+                <label htmlFor="timezone">
+                  Timezone
+                </label>
+
+                <select
+                  id="timezone"
+                  name="timezone"
+                  defaultValue={session.timezone}
+                  required
+                >
+                  {timezones.map((timezone) => (
+                    <option
+                      key={timezone}
+                      value={timezone}
+                    >
+                      {timezone}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="field">
                 <label htmlFor="starts_at">
                   Start Date & Time
                 </label>
@@ -201,7 +224,8 @@ export default async function EditSessionPage({
                   name="starts_at"
                   type="datetime-local"
                   defaultValue={toDateTimeLocal(
-                    session.starts_at
+                    session.starts_at,
+                    session.timezone
                   )}
                   required
                 />
@@ -217,7 +241,8 @@ export default async function EditSessionPage({
                   name="ends_at"
                   type="datetime-local"
                   defaultValue={toDateTimeLocal(
-                    session.ends_at
+                    session.ends_at,
+                    session.timezone
                   )}
                 />
               </div>

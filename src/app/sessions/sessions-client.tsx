@@ -19,6 +19,7 @@ type LearnerSession = {
   sessionType: string;
   startsAt: string;
   endsAt: string | null;
+  timezone: string;
   location: string | null;
   meetingUrl: string | null;
   courseTitle: string | null;
@@ -30,10 +31,18 @@ type SessionsClientProps = {
   sessions: LearnerSession[];
 };
 
-function formatSessionDate(value: string) {
+function formatSessionDate(
+  value: string,
+  timezone: string
+) {
   return new Intl.DateTimeFormat("en-CA", {
-    dateStyle: "medium",
-    timeStyle: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: timezone,
+    timeZoneName: "short",
   }).format(new Date(value));
 }
 
@@ -74,6 +83,7 @@ export default function SessionsClient({
         session.courseTitle ?? "",
         session.location ?? "",
         session.sessionType,
+        session.timezone,
         sessionTypeLabel(session.sessionType),
       ]
         .join(" ")
@@ -189,12 +199,14 @@ export default function SessionsClient({
                       />
 
                       {formatSessionDate(
-                        session.startsAt
+                        session.startsAt,
+                        session.timezone
                       )}
 
                       {session.endsAt
                         ? ` – ${formatSessionDate(
-                            session.endsAt
+                            session.endsAt,
+                            session.timezone
                           )}`
                         : ""}
                     </span>

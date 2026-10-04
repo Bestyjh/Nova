@@ -2,8 +2,21 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { fromZonedTime } from "date-fns-tz";
 
 import { requireAdmin } from "@/lib/auth/require-admin";
+
+function isValidTimeZone(timeZone: string) {
+  try {
+    Intl.DateTimeFormat(undefined, {
+      timeZone,
+    }).format();
+
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export async function createSession(
   formData: FormData
@@ -29,6 +42,10 @@ export async function createSession(
 
   const endsAt = String(
     formData.get("ends_at") ?? ""
+  ).trim();
+
+  const timezone = String(
+    formData.get("timezone") ?? ""
   ).trim();
 
   const location = String(
@@ -58,6 +75,12 @@ export async function createSession(
     );
   }
 
+  if (!timezone || !isValidTimeZone(timezone)) {
+    throw new Error(
+      "A valid session timezone is required."
+    );
+  }
+
   const allowedTypes = [
     "online",
     "in_person",
@@ -70,7 +93,10 @@ export async function createSession(
     );
   }
 
-  const startDate = new Date(startsAt);
+  const startDate = fromZonedTime(
+    startsAt,
+    timezone
+  );
 
   if (Number.isNaN(startDate.getTime())) {
     throw new Error(
@@ -81,15 +107,18 @@ export async function createSession(
   let endDate: Date | null = null;
 
   if (endsAt) {
-    endDate = new Date(endsAt);
+    endDate = fromZonedTime(
+      endsAt,
+      timezone
+    );
 
-    if (Number.isNaN(endDate.getTime())) {
+  if (Number.isNaN(endDate.getTime())) {
       throw new Error(
         "Invalid session end date."
       );
     }
 
-    if (endDate <= startDate) {
+  if (endDate <= startDate) {
       throw new Error(
         "Session end time must be after the start time."
       );
@@ -106,6 +135,7 @@ export async function createSession(
       ends_at: endDate
         ? endDate.toISOString()
         : null,
+      timezone,
       location: location || null,
       meeting_url: meetingUrl || null,
       course_id: courseId || null,
@@ -155,6 +185,10 @@ export async function updateSession(
     formData.get("ends_at") ?? ""
   ).trim();
 
+  const timezone = String(
+    formData.get("timezone") ?? ""
+  ).trim();
+
   const location = String(
     formData.get("location") ?? ""
   ).trim();
@@ -182,6 +216,12 @@ export async function updateSession(
     );
   }
 
+  if (!timezone || !isValidTimeZone(timezone)) {
+    throw new Error(
+      "A valid session timezone is required."
+    );
+  }
+
   const allowedTypes = [
     "online",
     "in_person",
@@ -194,7 +234,10 @@ export async function updateSession(
     );
   }
 
-  const startDate = new Date(startsAt);
+  const startDate = fromZonedTime(
+    startsAt,
+    timezone
+  );
 
   if (Number.isNaN(startDate.getTime())) {
     throw new Error(
@@ -205,7 +248,10 @@ export async function updateSession(
   let endDate: Date | null = null;
 
   if (endsAt) {
-    endDate = new Date(endsAt);
+      endDate = fromZonedTime(
+      endsAt,
+      timezone
+    );
 
     if (Number.isNaN(endDate.getTime())) {
       throw new Error(
@@ -230,6 +276,7 @@ export async function updateSession(
       ends_at: endDate
         ? endDate.toISOString()
         : null,
+      timezone,
       location: location || null,
       meeting_url: meetingUrl || null,
       course_id: courseId || null,

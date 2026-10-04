@@ -106,9 +106,6 @@ export default async function AdminSessionsPage() {
           ) : (
             <div className="courseGrid">
               {sessionList.map((session) => {
-                const startsAt = new Date(
-                  session.starts_at
-                );
 
                 return (
                   <article
@@ -141,8 +138,15 @@ export default async function AdminSessionsPage() {
                             marginRight: "8px",
                           }}
                         />
-
-                        {startsAt.toLocaleString()}
+                        {new Intl.DateTimeFormat("en-CA", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                          timeZone: session.timezone,
+                          timeZoneName: "short",
+                        }).format(new Date(session.starts_at))}
                       </p>
 
                       {session.session_type ===
