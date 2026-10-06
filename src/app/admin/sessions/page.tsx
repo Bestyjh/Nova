@@ -83,7 +83,7 @@ export default async function AdminSessionsPage() {
 
             <div className="statCard">
               <strong>{draftCount}</strong>
-              <span>Drafts</span>
+              <span>{draftCount === 1 ? "Draft" : "Drafts"}</span>
             </div>
           </div>
 
@@ -178,17 +178,25 @@ export default async function AdminSessionsPage() {
                       )}
 
                       <p className="courseMeta">
-  {Array.isArray(session.courses)
-    ? session.courses[0]?.title ??
-      "General Session"
-    : "General Session"}
-</p>
-<Link
-  href={`/admin/sessions/${session.id}/edit`}
-  className="button"
->
-  Edit Session
-</Link>
+                      {(() => {
+                        const courseRelation = session.courses as
+                          | { id: string; title: string; slug: string }[]
+                          | { id: string; title: string; slug: string }
+                          | null;
+
+                        const courseTitle = Array.isArray(courseRelation)
+                          ? courseRelation[0]?.title
+                          : courseRelation?.title;
+
+                        return courseTitle ?? "General Session";
+                      })()}
+                    </p>
+                    <Link
+                      href={`/admin/sessions/${session.id}/edit`}
+                      className="button"
+                    >
+                      Edit Session
+                    </Link>
                     </div>
                   </article>
                 );

@@ -31,8 +31,14 @@ export default async function SessionsPage() {
 
   const sessionList = (sessions ?? []).map(
     (session) => {
-  const courseTitle =
-  session.courses?.[0]?.title ?? null;
+  const courseRelation = session.courses as
+  | { id: string; title: string; slug: string }[]
+  | { id: string; title: string; slug: string }
+  | null;
+
+const courseTitle = Array.isArray(courseRelation)
+  ? courseRelation[0]?.title ?? null
+  : courseRelation?.title ?? null;
       return {
         id: session.id,
         title: session.title,
