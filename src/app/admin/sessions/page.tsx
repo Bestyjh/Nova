@@ -71,10 +71,12 @@ export default async function AdminSessionsPage() {
               flexWrap: "wrap",
             }}
           >
-            <div className="statCard">
-              <strong>{sessionList.length}</strong>
-              <span>Total Sessions</span>
-            </div>
+                <div className="statCard">
+                <strong>{sessionList.length}</strong>
+                <span>
+                  {sessionList.length === 1 ? "Total Session" : "Total Sessions"}
+                </span>
+              </div>
 
             <div className="statCard">
               <strong>{publishedCount}</strong>
